@@ -1,0 +1,3876 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerMate - Build Your Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8f9fc 0%, #eef2f6 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.has-sidebar-layout {
+            flex-direction: row;
+        }
+
+        /* Sidebar specific styles */
+        .sidebar {
+            background-color: #1e3a8a;  /* Deep blue */
+            width: 60px;
+            min-width: 60px;
+            align-items: center;
+            background-color: #4f46e5;
+            width: 80px; /* Collapsed view default */
+            min-width: 80px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            display: none;
+            flex-direction: column;
+            padding: 16px 0;
+            overflow-y: auto;
+            transition: width 0.3s ease; /* Smooth transition for width */
+        }
+        body.has-sidebar-layout .sidebar {
+            background-color: #1e3a8a;  /* Deep blue */
+            width: 60px;
+            min-width: 60px;
+            align-items: center;
+            background-color: #4f46e5;
+            display: flex;
+        }
+
+        @media (min-width: 1025px) { /* Expanded view on larger screens */
+            .sidebar {
+                background-color: #1e3a8a;  /* Deep blue */
+                width: 60px;
+                min-width: 60px;
+                align-items: center;
+                background-color: #4f46e5;
+                width: 240px; /* Expanded width */
+                min-width: 240px;
+            }
+            .sidebar-logo span {
+                display: inline;
+            }
+            .sidebar-nav-item {
+                justify-content: center;
+                color: white;
+                flex-direction: row;
+                justify-content: flex-start;
+                padding: 12px 24px;
+            }
+            .sidebar-nav-item i {
+                color: #dbeafe;
+                color: white;
+                margin-right: 12px;
+                margin-bottom: 0;
+            }
+            .sidebar-nav-item span {
+                display: block;
+            }
+            .sidebar-nav-item.active {
+                background-color: #1e40af;
+                color: white;
+                border-left: none;
+                border-left: 4px solid #4f46e5;
+                border-bottom: none; /* Remove bottom border for desktop active */
+                padding-left: 20px; /* Adjust padding due to border-left */
+            }
+            .sidebar-pro-button {
+                display: block; /* Show button in expanded view */
+            }
+        }
+
+        .sidebar-logo {
+            padding: 0 0 16px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+        }
+        .sidebar-logo span {
+            display: none; /* Hidden in collapsed view */
+            color: #4f46e5;
+        }
+        .sidebar-nav-item {
+            justify-content: center;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            color: #64748b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            text-align: center;
+        }
+        .sidebar-nav-item:hover {
+            background-color: #f0f2f5;
+            color: #4f46e5;
+        }
+        .sidebar-nav-item.active {
+            background-color: #1e40af;
+            color: white;
+            border-left: none;
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            border-left: 4px solid #4f46e5;
+            padding-left: 0;
+        }
+        .sidebar-nav-item i {
+            color: #dbeafe;
+            color: white;
+            margin-right: 0;
+            margin-bottom: 8px; /* Increased spacing */
+            font-size: 20px;
+        }
+        .sidebar-nav-item span {
+            font-size: 12px;
+            display: none; /* Hidden in collapsed view */
+        }
+        .sidebar-pro-button {
+            background: linear-gradient(to right, #4f46e5, #7c3aed);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin: 24px;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: none; /* Hide button in collapsed view */
+        }
+        .sidebar-pro-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(79, 70, 229, 0.4);
+        }
+        
+        /* Main Content Wrapper */
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        /* Header */
+        .header {
+            border-radius: 0;
+            margin-left: 0;
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+        
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-icon { width: 36px; height: 36px; background: #e0e7ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-size: 20px; }
+        .logo-text { font-size: 20px; font-weight: 700; color: #1e293b; }
+        .logo-text span { color: #4f46e5; }
+        /* Removed .progress-container, .step-counter, .progress-bar, .progress-fill */
+        
+        /* Main Content Area for Form Steps */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        .form-step {
+            width: 100%;
+            max-width: 520px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+        
+        #step3.form-step { max-width: 1200px; }
+
+        #step5.form-step, #step6.form-step, #step7.form-step, #step8.form-step, #step9.form-step, #step10.form-step { /* Updated for new step count */
+            max-width: 1200px;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        .form-step.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #4f46e5; font-size: 32px; margin-bottom: 24px; }
+        .step-title { font-size: 28px; font-weight: 700; color: #1e293b; text-align: center; margin-bottom: 16px; line-height: 1.3; }
+        .step-description { font-size: 16px; color: #64748b; text-align: center; max-width: 400px; margin-bottom: 32px; }
+        
+        .experience-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; max-width: 480px; margin-bottom: 32px; }
+        .experience-btn { background: white; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+        .experience-btn:hover { border-color: #c7d2fe; transform: translateY(-3px); }
+        .experience-btn.active { background: #f0f9ff; border-color: #93c5fd; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15); transform: translateY(-3px); }
+        .template-card.selected { border-color: #6366F1; box-shadow: 0 10px 25px rgba(79, 70, 229, 0.15); transform: translateY(-3px); }
+        .btn-icon { font-size: 28px; color: #4f46e5; margin-bottom: 12px; }
+        .btn-text { font-size: 16px; font-weight: 600; color: #1e293b; }
+        
+        .country-container { width: 100%; max-width: 400px; margin-bottom: 32px; }
+        .country-label { display: block; font-size: 14px; font-weight: 600; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: left; }
+        .country-select { width: 100%; padding: 16px; background: white; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; color: #1e293b; appearance: none; transition: all 0.3s ease; }
+        .country-select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15); }
+        .select-wrapper { position: relative; }
+        .select-wrapper::after { content: "⌄"; position: absolute; top: 50%; right: 16px; transform: translateY(-50%); color: #4f46e5; font-size: 20px; pointer-events: none; }
+        
+        .btn { 
+            width: 100%; 
+            max-width: 320px; 
+            padding: 14px 24px; 
+            border-radius: 9999px; 
+            font-size: 16px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        .btn-primary {
+            padding: 14px 28px; 
+            background: linear-gradient(to right, #4f46e5, #7c3aed); 
+            color: white; 
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35); /* Stronger shadow */
+            padding: 16px 30px; /* Increased padding */
+            font-size: 17px; /* Slightly larger font */
+        }
+        .btn-primary:hover { 
+            transform: translateY(-4px); /* More pronounced lift */
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5); /* Stronger shadow on hover */
+        }
+        .btn-secondary { 
+            background: white; 
+            color: #4f46e5; 
+            border: 2px solid #e2e8f0; /* Original border color */
+            margin-top: 15px; /* Slightly increased margin */
+            padding: 14px 28px; /* Slightly increased padding */
+            font-size: 16px;
+            border-radius: 9999px;
+        }
+        .btn-secondary:hover { 
+            background: #f0f2f5; /* More visible hover background */
+            border-color: #a7b7f9; /* Stronger border color on hover */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow on hover */
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (max-width: 1024px) {
+            .sidebar {
+                background-color: #1e3a8a;  /* Deep blue */
+                width: 60px;
+                min-width: 60px;
+                align-items: center;
+                background-color: #4f46e5;
+                width: 80px;
+                min-width: 80px;
+                padding: 16px 0;
+            }
+            .sidebar-logo {
+                padding: 0 0 16px;
+                text-align: center;
+            }
+            .sidebar-logo span { display: none; }
+            .sidebar-nav-item {
+                justify-content: center;
+                color: white;
+                justify-content: center;
+                padding: 12px 0;
+            }
+            .sidebar-nav-item i {
+                color: #dbeafe;
+                color: white; margin-right: 0; }
+            .sidebar-nav-item span { display: none; }
+            .sidebar-nav-item.active {
+                background-color: #1e40af;
+                color: white;
+                border-left: none;
+                padding-left: 0;
+                border-left: none;
+                border-bottom: 4px solid #4f46e5;
+            }
+            .sidebar-pro-button { display: none; }
+            .main-content-wrapper { margin: 8px; }
+            .header {
+                border-radius: 0;
+                margin-left: 0;
+                padding: 16px;
+            }
+            .logo-text { font-size: 18px; }
+            /* Removed .progress-bar, .step-counter */
+            .step-title { font-size: 24px; }
+            .step-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+            .experience-grid {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+            }
+            .btn {
+                max-width: 280px;
+                padding: 12px 20px;
+            }
+            .template-card {
+                max-width: 300px; 
+                margin: 0 auto; 
+            }
+            .template-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+            
+            #step5.form-step, #step6.form-step, #step7.form-step, #step8.form-step, #step9.form-step, #step10.form-step { /* Updated for new step count */
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+            .form-column-wrapper, .resume-preview-section {
+                width: 100%;
+                max-width: none;
+                height: auto;
+            }
+            .resume-preview-section { margin-top: 20px; }
+            #step5 .back-to-templates-link { align-self: center; }
+        }
+        @media (max-width: 768px) {
+            html, body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .sidebar {
+                background-color: #1e3a8a;  /* Deep blue */
+                width: 60px;
+                min-width: 60px;
+                align-items: center;
+                background-color: #4f46e5;
+                width: 100%;
+                min-width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: space-around;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                padding-top: 90px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .sidebar-logo { display: none; }
+            .sidebar-nav-item {
+                justify-content: center;
+                color: white;
+                padding: 8px 12px;
+                flex-direction: column;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .sidebar-nav-item i {
+                color: #dbeafe;
+                color: white;
+                margin-right: 0;
+                margin-bottom: 4px;
+                font-size: 16px;
+            }
+            .sidebar-nav-item span { display: block; }
+            .sidebar-nav-item.active {
+                background-color: #1e40af;
+                color: white;
+                border-left: none;
+                border-bottom: 2px solid #4f46e5; padding-bottom: 6px; }
+            .main-content-wrapper { margin: 0; border-radius: 0; }
+        }
+        @media (max-width: 480px) {
+            .header {
+                border-radius: 0;
+                margin-left: 0;
+                flex-direction: column;
+                gap: 10px;
+            }
+            /* Removed .progress-container */
+            .step-title { font-size: 22px; }
+            .step-description { font-size: 14px; }
+            .experience-btn { padding: 16px 12px; }
+            .btn-icon { font-size: 24px; }
+            .btn-text { font-size: 14px; }
+            .country-select { padding: 12px; font-size: 14px; }
+            .btn { padding: 12px; font-size: 14px; }
+            .template-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Styles for Step 4 cards */
+        .build-option-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .build-option-card:hover {
+            border-color: #c7d2fe;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.1);
+        }
+        .build-option-card .icon { font-size: 48px; color: #4f46e5; margin-bottom: 16px; }
+        .build-option-card .title { font-size: 20px; font-weight: 600; color: #1e293b; margin-bottom: 8px; }
+        .build-option-card .description { font-size: 14px; color: #64748b; margin-bottom: 24px; }
+        .build-option-card .upload-info { font-size: 12px; color: #94a3b8; margin-top: 16px; }
+        .build-option-card .upload-link { color: #4f46e5; text-decoration: none; font-weight: 500; margin-top: 8px; display: inline-block; }
+
+        /* Color Swatch Styling */
+        
+        .color-swatch.selected {
+            border-color: #1e293b; 
+            transform: scale(1.05); 
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3); 
+        }
+
+        /* Template Grid and Image */
+        .template-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px; 
+            margin-bottom: 32px;
+        }
+        .template-image {
+            width: 100%;
+            height: 380px; 
+            object-fit: cover;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer; /* Indicates the image is clickable */
+        }
+        /* Recommended badge style */
+        .recommended-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #4f46e5;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        /* Style for template cards */
+        .template-card {
+            position: relative; /* Needed for absolute positioning of badge */
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden; /* Ensures image corners are rounded */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Pushes button to bottom */
+        }
+        .template-card:hover {
+            border-color: #c7d2fe;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.1);
+        }
+
+
+        /* Form Sections */
+        .form-section {
+            flex: 1;
+            max-width: 600px;
+            background-color: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+        .form-section .step-title { text-align: left; margin-bottom: 8px; }
+        .form-section .step-description { text-align: left; margin-bottom: 24px; }
+
+        .form-row { display: flex; gap: 20px; width: 100%; margin-bottom: 16px; }
+        .form-field { flex: 1; display: flex; flex-direction: column; }
+        .form-field label { font-size: 14px; font-weight: 500; color: #334155; margin-bottom: 6px; }
+        .form-field input, .form-field select, .form-field textarea { 
+            padding: 12px 14px; /* Slightly larger padding */
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            color: #1e293b; 
+            transition: border-color 0.2s ease, box-shadow 0.2s ease; 
+        }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus { 
+            outline: none; 
+            border-color: #4f46e5; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2); 
+        }
+        
+        /* A4 Preview Section */
+        .resume-preview-section {
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            width: 635px; /* 850px * 0.75 */
+            height: 882px; /* 1195px * 0.75 */
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Ensure content outside preview area is hidden */
+        }
+
+        .resume-preview-content {
+            background-color: white;
+            width: 595px; /* Standard A4 width at 72dpi */
+            height: 842px; /* Standard A4 height at 72dpi */
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .scaled-content-wrapper {
+            width: 850px; /* Base width for templates */
+            height: 1195px; /* Base height for templates */
+            transform-origin: top left;
+            transform: scale(0.7); /* Scale to fit 595x836.5 (close to A4) */
+            /* Add this to prevent content bleed outside the wrapper due to overflow */
+            overflow: hidden; 
+        }
+        
+        .back-to-templates-link { align-self: flex-start; margin-bottom: 20px; }
+        .form-column-wrapper { display: flex; flex-direction: column; flex: 1; max-width: 600px; }
+        .navigation-buttons-container { display: flex; justify-content: center; gap: 16px; width: 100%; max-width: 320px; margin-top: 24px; align-self: center; }
+
+        /* Template 1 Specific Styles */
+        .template1-resume { 
+            width: 850px; /* Fixed width */
+            height: 1195px; /* Fixed height */
+            background: white; 
+            margin: auto; /* Center within wrapper */
+            padding: 40px; /* Internal padding */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            box-sizing: border-box; /* Include padding in width/height */
+            overflow: hidden; /* Prevent content overflow */
+            font-family: 'Segoe UI', sans-serif; /* Moved from .template1-body */
+            color: #000; /* Moved from .template1-body */
+        }
+        .template1-resume header h1 { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
+        .template1-resume .contact { font-size: 14px; color: #555; margin-bottom: 20px; }
+        .template1-resume section { margin-top: 30px; }
+        .template1-resume section h2 { font-size: 18px; font-weight: bold; border-left: 4px solid #000; padding-left: 10px; margin-bottom: 10px; }
+        .template1-resume .skills { display: grid; grid-template-columns: repeat(2, 1fr); list-style: disc; padding-left: 20px; gap: 5px; }
+        .template1-resume .job { margin-bottom: 20px; }
+        .template1-resume ul { padding-left: 20px; }
+
+        /* Template 2 Specific Styles */
+        .template2-resume {
+            width: 850px; /* Fixed width */
+            height: 1195px; /* Fixed height */
+            background: white;
+            margin: auto; /* Center within wrapper */
+            padding: 40px; /* Internal padding */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-sizing: border-box; /* Include padding in width/height */
+            overflow: hidden; /* Prevent content overflow */
+        }
+
+        .template2-header {
+            text-align: center;
+            background-color: #0078C1;
+            color: white;
+            padding: 30px 20px;
+            /* Removed negative margin - relies on template2-resume padding */
+            margin-bottom: 30px; 
+        }
+
+        .template2-header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .template2-header p {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .template2-h2 {
+            color: #0078C1;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        .template2-p, .template2-li {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .template2-skills {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .template2-skills ul {
+            width: 48%;
+            list-style: disc inside;
+            margin: 0;
+            padding: 0;
+        }
+
+        .template2-experience, .template2-education, .template2-languages {
+            margin-top: 20px;
+        }
+
+        .template2-job {
+            margin-bottom: 20px;
+        }
+
+        .template2-job-title {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .template2-company {
+            font-style: italic;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .template2-ul {
+            margin-left: 20px;
+            padding-left: 0;
+        }
+
+        /* Template 3 Specific Styles */
+        /* Removed template3-body as it's not directly applied to the resume element */
+        .template3-resume {
+            width: 850px; /* Fixed width */
+            height: 1195px; /* Fixed height */
+            background: #fff;
+            display: grid;
+            grid-template-columns: 60% 40%;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Moved from .template3-body */
+            color: #000; /* Moved from .template3-body */
+        }
+        .template3-header {
+            grid-column: span 2;
+            text-align: center;
+            background-color: #000;
+            color: white;
+            padding: 20px 20px 10px; /* Adjusted padding to fixed px */
+        }
+        .template3-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 1px;
+        }
+        .template3-header .contact {
+            font-size: 0.85rem;
+            color: #fff;
+            margin-top: 0.3rem;
+        }
+        .template3-main {
+            padding: 20px 25px; /* Adjusted padding to fixed px */
+        }
+        .template3-sidebar {
+            background-color: #fafafa;
+            border-left: 2px solid #e1e1e1;
+            padding: 20px; /* Adjusted padding to fixed px */
+        }
+        .template3-h2 {
+            color: #d32f2f;
+            font-size: 1rem;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .template3-ul {
+            padding-left: 1rem;
+        }
+        .template3-ul li {
+            margin-bottom: 0.5rem;
+        }
+        .template3-section {
+            margin-bottom: 1.5rem;
+        }
+        .template3-lang-bar {
+            height: 6px;
+            background-color: #eee;
+            border-radius: 44px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+        .template3-lang-bar span {
+            display: block;
+            height: 100%;
+            background-color: #d32f2f;
+        }
+        .template3-subheading {
+            font-weight: bold;
+            color: #333;
+            margin-top: 0.75rem;
+        }
+        .template3-item-title {
+            font-weight: bold;
+        }
+        .template3-item-org {
+            color: #555;
+            font-style: italic;
+        }
+        .template3-p { /* Added for general paragraph styling in Template 3 */
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Template 4 Specific Styles (Richard Sanchez Resume) */
+        .template4-resume {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 850px; /* Fixed width for preview */
+            height: 1195px; /* Fixed height for preview */
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template4-left-section {
+            background: #00332c;
+            color: white;
+            width: 35%;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .template4-left-section img {
+            width: 100px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .template4-section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #046c5d;
+            border-radius: 20px;
+        }
+
+        .template4-left-section p,
+        .template4-left-section li {
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .template4-right-section {
+            background: #fff;
+            width: 65%;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .template4-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00332c;
+        }
+
+        .template4-role {
+            font-size: 18px;
+            color: #046c5d;
+            margin-bottom: 15px;
+        }
+
+        .template4-summary {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .template4-work-section h3,
+        .template4-skills-section h3 {
+            font-size: 18px;
+            background: #00332c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .template4-experience-item,
+        .template4-skill-item {
+            margin-bottom: 20px;
+        }
+
+        .template4-experience-item strong {
+            display: block;
+            color: #000;
+        }
+
+        .template4-bar {
+            background-color: #d8d8d8;
+            border-radius: 20px;
+            overflow: hidden;
+            height: 8px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .template4-bar-fill {
+            height: 100%;
+            background-color: #046c5d;
+            width: 80%;
+        }
+
+        .template4-bar-fill.uiux {
+            width: 60%;
+        }
+
+        .template4-bar-fill.typography {
+            width: 90%;
+        }
+
+        .template4-bar-fill.logo {
+            width: 95%;
+        }
+
+        .template4-bar-fill.concept {
+            width: 70%;
+        }
+
+        /* Template 5 Specific Styles (Harper Russo Resume) */
+        .template5-resume {
+            font-family: 'Montserrat', sans-serif;
+            background: #fff;
+            display: flex;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            width: 850px; /* Fixed width for preview */
+            height: 1195px; /* Fixed height for preview */
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template5-sidebar {
+            width: 32%;
+            background: #1f2937;
+            color: #fff;
+            padding: 40px 25px;
+            text-align: center;
+        }
+
+        .template5-sidebar img {
+            width: 130px;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            margin-bottom: 20px;
+        }
+
+        .template5-sidebar .contact-info {
+            margin: 30px 0;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .template5-contact-info div {
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .template5-contact-info i {
+            color: #fbbf24;
+        }
+
+        .template5-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            color: #fbbf24;
+            border-bottom: 1px solid #fbbf24;
+            padding-bottom: 4px;
+        }
+
+        .template5-skills, .template5-awards {
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .template5-skills .skill {
+            margin-bottom: 16px;
+        }
+
+        .template5-skill-name {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .template5-dots {
+            display: flex;
+            gap: 5px;
+        }
+
+        .template5-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            opacity: 0.3;
+        }
+
+        .template5-dot.filled {
+            background: #fbbf24;
+            opacity: 1;
+        }
+
+        .template5-awards ul {
+            padding-left: 18px;
+            margin-top: 10px;
+        }
+
+        .template5-awards li {
+            margin-bottom: 10px;
+        }
+
+        .template5-main {
+            width: 68%;
+            padding: 50px 40px;
+        }
+
+        .template5-main h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .template5-main h3 {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .template5-section {
+            margin-bottom: 30px;
+        }
+
+        .template5-section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #374151;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #d1d5db;
+            padding-bottom: 4px;
+        }
+
+        .template5-section p {
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .template5-job {
+            margin-top: 18px;
+        }
+
+        .template5-job h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .template5-job small {
+            display: block;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        /* Template 6 Specific Styles (Connor Hamilton Resume) */
+        .template6-resume {
+            font-family: 'Montserrat', sans-serif;
+            background: #fff;
+            display: flex;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            width: 850px; /* Fixed width for preview */
+            height: 1195px; /* Fixed height for preview */
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template6-sidebar {
+            width: 30%;
+            background: #e8ecf3;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .template6-sidebar .template6-photo {
+            width: 120px;
+            height: 140px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin: 10px auto 20px;
+        }
+
+        .template6-sidebar h2 {
+            font-size: 13px;
+            margin: 25px 0 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .template6-sidebar p,
+        .template6-sidebar li {
+            font-size: 12px;
+            text-align: left;
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+
+        .template6-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .template6-main {
+            width: 70%;
+            padding: 30px 30px 40px;
+        }
+
+        .template6-header {
+            background: #2563eb;
+            color: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .template6-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .template6-header h3 {
+            font-size: 13px;
+            margin-top: 5px;
+            font-weight: 400;
+        }
+
+        .template6-section {
+            margin-bottom: 20px;
+        }
+
+        .template6-section h2 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .template6-entry {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 2px solid #2563eb;
+        }
+
+        .template6-entry::before {
+            content: '●';
+            position: absolute;
+            left: -10px;
+            top: 2px;
+            font-size: 12px;
+            color: #2563eb;
+        }
+
+        .template6-entry h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .template6-entry small {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .template6-entry ul {
+            margin-top: 6px;
+            padding-left: 18px;
+        }
+
+        .template6-entry ul li {
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .template6-section p {
+            font-size: 12.5px;
+            color: #374151;
+            line-height: 1.5;
+        }
+
+        /* NEW: Template 7 Specific Styles (Lorna Alvarado Resume) */
+        .template7-resume {
+            font-family: 'Segoe UI', sans-serif; /* Changed to Segoe UI as per provided HTML */
+            background: #fff;
+            display: flex;
+            width: 850px; /* Fixed width for preview */
+            height: 1195px; /* Fixed height for preview */
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template7-left {
+            width: 30%;
+            background-color: #eeeeee;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .template7-profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        .template7-section {
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .template7-section h3 {
+            background-color: #2d2d2d;
+            color: white;
+            font-size: 14px;
+            margin: 0;
+            padding: 6px 10px;
+        }
+
+        .template7-section p, .template7-section li {
+            font-size: 12px;
+            margin: 6px 10px;
+            color: #333;
+        }
+
+        .template7-section ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .template7-right {
+            width: 70%;
+            padding: 30px 40px;
+            color: #333;
+        }
+
+        .template7-right h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #222;
+        }
+
+        .template7-right h2 {
+            font-size: 14px;
+            font-weight: normal;
+            margin: 4px 0 20px;
+            color: #666;
+        }
+
+        .template7-right section {
+            margin-bottom: 25px;
+        }
+
+        .template7-right section h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #000;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+
+        .template7-job {
+            margin-bottom: 15px;
+        }
+
+        .template7-job h4 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .template7-job span {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .template7-job ul {
+            font-size: 12px;
+            margin: 5px 0 0 20px;
+            padding: 0;
+        }
+
+        .template7-references {
+            display: flex;
+            gap: 50px;
+        }
+
+        .template7-reference {
+            font-size: 12px;
+        }
+
+        .template7-reference h4 {
+            font-size: 13px;
+            margin-bottom: 2px;
+            color: #000;
+        }
+
+        .template7-reference p {
+            margin: 2px 0;
+        }
+
+        /* NEW: Template 8 Specific Styles (Pragya Aggarwal Resume) */
+        .template8-resume {
+            font-family: 'Segoe UI', sans-serif;
+            background: #fff;
+            color: #333;
+            width: 850px; /* Fixed width for preview */
+            height: 1195px; /* Fixed height for preview */
+            padding: 30px 40px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            transform: scale(1);
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template8-header {
+            background: #0b1f3a;
+            color: white;
+            padding: 20px 30px;
+            position: relative;
+        }
+
+        .template8-header h1 {
+            color: #ffdc3f;
+            font-size: 28px;
+        }
+
+        .template8-header h2 {
+            font-size: 16px;
+            font-weight: 400;
+            color: #cccccc;
+        }
+
+        .template8-contact-info {
+            position: absolute;
+            right: 30px;
+            top: 20px;
+            text-align: right;
+            color: white;
+            font-size: 12px;
+        }
+
+        .template8-contact-info div {
+            margin-bottom: 5px;
+        }
+
+        .template8-section {
+            margin: 25px 0;
+        }
+
+        h3.template8-section-title {
+            font-size: 14px;
+            background: #f4f4f4;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .template8-about p, .template8-experience p {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .template8-experience-item, .template8-education-item {
+            margin-bottom: 15px;
+        }
+
+        .template8-experience-title {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .template8-experience-date {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            width: 80px;
+        }
+
+        .template8-experience-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        ul.template8-skills {
+            list-style: disc;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px 30px;
+            padding-left: 20px;
+            font-size: 12px;
+        }
+
+        .template8-education-block, .template8-language-block {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .template8-education-block strong, .template8-language-block strong {
+            font-weight: 600;
+        }
+
+        .template8-highlight-box {
+            background-color: #ffe56b;
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        /* NEW: Template 9 Specific Styles (Olivia Wilson Resume) */
+        .template9-resume {
+            width: 850px; /* 210mm at 72dpi */
+            height: 1195px; /* 297mm at 72dpi */
+            margin: auto;
+            background: white;
+            display: flex;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', sans-serif;
+            color: #333;
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template9-left {
+            width: 35%;
+            background: #f8f8f8;
+            padding: 30px 20px;
+            text-align: center;
+            border-right: 1px solid #ccc;
+        }
+
+        .template9-left img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .template9-section {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .template9-section h3 {
+            font-size: 14px;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .template9-section p,
+        .template9-section li {
+            font-size: 12px;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .template9-section ul {
+            padding-left: 18px;
+        }
+
+        .template9-right {
+            width: 65%;
+            padding: 30px 40px;
+            color: #333;
+        }
+
+        .template9-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #111;
+        }
+
+        .template9-title {
+            font-size: 14px;
+            color: gray;
+            margin-bottom: 15px;
+        }
+
+        .template9-contacts {
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .template9-contacts div {
+            margin-bottom: 6px;
+        }
+
+        .template9-profile,
+        .template9-work,
+        .template9-references {
+            margin-top: 20px;
+        }
+
+        .template9-profile p {
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .template9-work h4 {
+            font-size: 13px;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 4px;
+        }
+
+        .template9-work span {
+            float: right;
+            font-size: 12px;
+            color: #444;
+        }
+
+        .template9-work ul {
+            font-size: 12px;
+            padding-left: 18px;
+            margin-top: 6px;
+            margin-bottom: 14px;
+        }
+
+        .template9-reference-entry {
+            display: inline-block;
+            width: 48%;
+            vertical-align: top;
+            margin-top: 10px;
+        }
+
+        .template9-reference-entry p {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* NEW: Template 10 Specific Styles (Isabel Mercado Resume) */
+        .template10-resume {
+            display: flex;
+            width: 850px; /* 210mm at 72dpi */
+            height: 1195px; /* 297mm at 72dpi */
+            background-color: #fff;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transform: scale(1); /* No scaling inside the wrapper */
+            transform-origin: top left;
+            box-sizing: border-box;
+        }
+
+        .template10-left-column {
+            width: 35%;
+            background-color: #fae3e3;
+            padding: 20mm 10mm;
+        }
+
+        .template10-right-column {
+            width: 65%;
+            padding: 20mm 15mm;
+        }
+
+        .template10-photo img {
+            width: 100%;
+            max-width: 160px;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        .template10-right-column h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .template10-left-column h2 {
+            color: #c55353;
+            margin-top: 25px;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .template10-right-column h3 {
+            font-weight: normal;
+            color: #555;
+            margin: 5px 0 20px;
+            font-size: 14px;
+        }
+
+        .template10-contact p {
+            margin: 4px 0;
+            font-size: 12px;
+        }
+
+        .template10-left-column p,
+        .template10-right-column p {
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .template10-right-column ul {
+            padding-left: 18px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .template10-right-column ul li {
+            margin-bottom: 5px;
+        }
+
+        .template10-left-column ul {
+            padding-left: 15px;
+        }
+
+        .template10-left-column ul li {
+            margin-bottom: 8px;
+        }
+    
+        .sidebar-nav-item.visited {
+            background-color: #c7d2fe;
+            color: #3730a3;
+        }
+        .sidebar-nav-item.active {
+            background-color: transparent;
+            border-left: none;
+            border-bottom: 3px solid #3b82f6; /* 👈 Now under the icon */
+            /* color: #dddbfe; */
+            font-weight: bold;
+            padding-left: 0;
+            
+        }
+
+        .sidebar-nav-item i {
+            background-color: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Upload Resume Modal Specific Styles */
+        .upload-modal-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .upload-modal-header {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .upload-modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .close-upload-modal {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 2rem;
+            color: #94a3b8;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .drag-drop-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #f8fafc;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drag-drop-area i {
+            font-size: 3rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        .drag-drop-area p {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .browse-button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .browse-button:hover {
+            background-color: #6366f1;
+        }
+
+        .acceptable-files {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 1rem;
+        }
+
+        .upload-options {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-options .or-divider {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .upload-options .line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: #e2e8f0;
+        }
+
+        .social-upload-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .social-upload-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: white;
+            color: #1e293b;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .social-upload-button:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .social-upload-button img {
+            height: 24px;
+            width: 24px;
+        }
+
+        .upload-modal-footer {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .upload-modal-footer .btn {
+            max-width: none; /* Override general .btn max-width */
+            width: auto;
+        }
+        /* Added for displaying selected file name */
+        #selectedFileName {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .upload-modal-content {
+                padding: 1.5rem;
+            }
+            .upload-options {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .upload-options .line {
+                display: none; /* Hide lines on small screens */
+            }
+            .upload-modal-footer {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="template1-content" style="display: none;">
+        <div class="template1-resume">
+            <header>
+                <h1 id="t1-name"></h1>
+                <div class="contact">
+                    <span id="t1-phone"></span> •
+                    <span id="t1-email"></span> •
+                    <span id="t1-address"></span>
+                </div>
+            </header>
+            <section>
+                <h2>Summary</h2>
+                <p id="t1-summary"></p>
+            </section>
+            <section>
+                <h2>Skills</h2>
+                <ul class="skills" id="t1-skills"></ul>
+            </section>
+            <section>
+                <h2>Experience</h2>
+                <div id="t1-experience"></div>
+            </section>
+            <section>
+                <h2>Education And Training</h2>
+                 <div id="t1-education"></div>
+            </section>
+            <section>
+                <h2>Languages</h2>
+                <div id="t1-languages">
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="template2-content" style="display: none;">
+        <div class="template2-resume">
+            <div class="template2-header">
+                <h1 id="t2-name"></h1>
+                <p id="t2-contact-info"></p>
+            </div>
+            <h2 class="template2-h2">Summary</h2>
+            <p class="template2-p" id="t2-summary"></p>
+
+            <h2 class="template2-h2">Skills</h2>
+            <div class="template2-skills">
+                <ul id="t2-skills-col1"></ul>
+                <ul id="t2-skills-col2"></ul>
+            </div>
+
+            <h2 class="template2-h2">Experience</h2>
+            <div class="template2-experience" id="t2-experience"></div>
+
+            <h2 class="template2-h2">Education and Training</h2>
+            <div class2-education" id="t2-education"></div>
+
+            <h2 class="template2-h2">Languages</h2>
+            <div class="template2-languages" id="t2-languages">
+                 </div>
+        </div>
+    </div>
+
+    <div id="template3-content" style="display: none;">
+        <div class="template3-resume">
+            <div class="template3-header">
+                <h1 id="t3-name"></h1>
+                <div class="contact" id="t3-contact-info"></div>
+            </div>
+            <div class="template3-main">
+                <div class="template3-section">
+                    <h2 class="template3-h2">SUMMARY</h2>
+                    <p class="template3-p" id="t3-summary"></p>
+                </div>
+                <div class="template3-section">
+                    <h2 class="template3-h2">EXPERIENCE</h2>
+                    <div id="t3-experience"></div>
+                </div>
+            </div>
+            <div class="template3-sidebar">
+                <div class="template3-section">
+                    <h2 class="template3-h2">SKILLS</h2>
+                    <ul class="template3-ul" id="t3-skills"></ul>
+                </div>
+                <div class="template3-section">
+                    <h2 class="template3-h2">EDUCATION AND TRAINING</h2>
+                    <div id="t3-education"></div>
+                </div>
+                <div class="template3-section">
+                    <h2 class="template3-h2">LANGUAGES</h2>
+                    <div id="t3-languages">
+                        </div>
+                </div>
+                <div class="template3-section">
+                    <h2 class="template3-h2">INTERESTS AND HOBBIES</h2>
+                    <ul class="template3-ul">
+                        <li>Recreational Football League</li>
+                        <li>Team captain</li>
+                        <li>Two-time League champions</li>
+                        <li>Red Cross Volunteer</li>
+                        <li>Taught classes in lifesaving skills including: CPR, First Aid</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 4 Content (Richard Sanchez Resume) -->
+    <div id="template4-content" style="display: none;">
+        <div class="template4-resume">
+            <div class="template4-left-section">
+                <!-- Placeholder for an image - uncomment and add src if you have one -->
+                <!-- <img src="https://placehold.co/100x100/046c5d/ffffff?text=RS" alt="Richard Sanchez Profile Picture"> -->
+
+                <div class="template4-section-title">Contact</div>
+                <p id="t4-phone">📞 +123-456-7890</p>
+                <p id="t4-email">📧 hello@reallygreatsite.com</p>
+                <p id="t4-website">🌐 www.reallygreatsite.com</p>
+                <p id="t4-address">📍 123 Anywhere St., Any City</p>
+
+                <div class="template4-section-title">Education</div>
+                <div id="t4-education">
+                    <p><strong>Rimberio University</strong><br>Bachelor’s Degree In Graphic Designer<br>2010 - 2014</p>
+                    <p><strong>Borcelle University</strong><br>Master’s Degree In Graphic Designer<br>2015 - 2017</p>
+                </div>
+
+                <div class="template4-section-title">Language</div>
+                <div id="t4-languages">
+                    <p><strong>English</strong><br>Hindi</p>
+                </div>
+            </div>
+
+            <div class="template4-right-section">
+                <div class="template4-name" id="t4-name">Richard Sanchez</div>
+                <div class="template4-role" id="t4-role">Graphic Designer</div>
+                <div class="template4-summary" id="t4-summary">
+                    I’m a creative Graphic Designer with expertise in branding, digital design, and visual communication, passionate about delivering innovative solutions.
+                </div>
+
+                <div class="template4-work-section">
+                    <h3>Work Experience</h3>
+                    <div id="t4-experience">
+                        <div class="template4-experience-item">
+                            <strong>Studio Showde (2014 - 2015)</strong>
+                            <p>Graphic Designer Internship</p>
+                            <ul>
+                                <li>Creating Visual Designs</li>
+                                <li>Collaborating with Teams</li>
+                            </ul>
+                        </div>
+                        <div class="template4-experience-item">
+                            <strong>Liceria Company (2016 - 2021)</strong>
+                            <p>Junior Graphic Designer</p>
+                            <ul>
+                                <li>Design Creation</li>
+                                <li>Revising and Editing</li>
+                            </ul>
+                        </div>
+                        <div class="template4-experience-item">
+                            <strong>Borcelle Studios (2022 - 2024)</strong>
+                            <p>Senior Graphic Designer</p>
+                            <ul>
+                                <li>Leading Design Projects</li>
+                                <li>Mentoring Junior Designers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template4-skills-section">
+                    <h3>Skills</h3>
+                    <div id="t4-skills">
+                        <div class="template4-skill-item">
+                            <p>Design Software</p>
+                            <div class="template4-bar"><div class="template4-bar-fill"></div></div>
+                        </div>
+                        <div class="template4-skill-item">
+                            <p>UI/UX Design</p>
+                            <div class="template4-bar"><div class="template4-bar-fill uiux"></div></div>
+                        </div>
+                        <div class="template4-skill-item">
+                            <p>Typography</p>
+                            <div class="template4-bar"><div class="template4-bar-fill typography"></div></div>
+                        </div>
+                        <div class="template4-skill-item">
+                            <p>Branding and Logo</p>
+                            <div class="template4-bar"><div class="template4-bar-fill logo"></div></div>
+                        </div>
+                        <div class="template4-skill-item">
+                            <p>Concept Development</p>
+                            <div class="template4-bar"><div class="template4-bar-fill concept"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 5 Content (Harper Russo Resume) -->
+    <div id="template5-content" style="display: none;">
+        <div class="template5-resume">
+            <div class="template5-sidebar">
+                <!-- <img src="https://placehold.co/130x130/1f2937/fbbf24?text=HR" alt="Harper Russo Profile Picture"> -->
+
+                <div class="template5-contact-info">
+                    <div id="t5-address">📍 123 Anywhere St, Any City</div>
+                    <div id="t5-phone">📞 123-456-7890</div>
+                    <div id="t5-email">📧 hello@reallygreatsite.com</div>
+                    <div id="t5-website">💻 reallygreatsite.com</div>
+                </div>
+
+                <div class="template5-skills">
+                    <div class="template5-section-title">Skills</div>
+                    <div id="t5-skills-content">
+                        <!-- Skills will be populated here by JS -->
+                        <div class="skill">
+                            <div class="skill-name">Project Management</div>
+                            <div class="dots">
+                                <span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot filled"></span><span class="dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template5-awards">
+                    <div class="template5-section-title">Language</div>
+                    <ul id="t5-languages-content">
+                        <!-- Languages will be populated here by JS -->
+                        <li>English</li>
+                        <li>Hindi</li>
+                        <li>Marathi</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="template5-main">
+                <h1 id="t5-name">Harper Russo</h1>
+                <h3 id="t5-role">Product Manager</h3> <!-- Assuming a fixed role or add input for it -->
+
+                <div class="template5-section">
+                    <h2>Profile</h2>
+                    <p id="t5-summary">I am a product manager with holistic knowledge of software development and design. I am also experienced in coordinating with stakeholders.</p>
+                </div>
+
+                <div class="template5-section">
+                    <h2>Education</h2>
+                    <div id="t5-education-content">
+                        <!-- Education will be populated here by JS -->
+                        <div class="job">
+                            <h4>BA Product Design | Cliffmor College</h4>
+                            <small>Jan 2010 – Jan 2014</small>
+                            <p>GPA: 3.26<br>Minor in Management.<br>Thesis involved studying several technology companies and optimizing their product design process.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template5-section">
+                    <h2>Experience</h2>
+                    <div id="t5-experience-content">
+                        <!-- Experience will be populated here by JS -->
+                        <div class="job">
+                            <h4>Product Manager | Thynk Unlimited</h4>
+                            <small>Jan 2016 – Present</small>
+                            <p>Conducted daily project coordination, planning, and implementation across teams.<br>Created technical and mechanical documentation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template 6 Content (Connor Hamilton Resume) -->
+    <div id="template6-content" style="display: none;">
+        <div class="template6-resume">
+            <div class="template6-sidebar">
+                <!-- <img src="https://placehold.co/120x140/e8ecf3/2563eb?text=CH" alt="Connor Hamilton Photo" class="template6-photo"> -->
+
+                <h2>Contact</h2>
+                <p id="t6-phone">📞 123-456-7890</p>
+                <p id="t6-email">📧 hello@reallygreatsite.com</p>
+                <p id="t6-address">📍 123 Anywhere St, Any City</p>
+                <p id="t6-website">🌐 www.reallygreatsite.com</p>
+
+                <h2>Skills</h2>
+                <ul id="t6-skills-content">
+                    <li>Project Management</li>
+                    <li>Public Relations</li>
+                    <li>Teamwork</li>
+                    <li>Time Management</li>
+                    <li>Leadership</li>
+                    <li>Effective Communication</li>
+                    <li>Digital Marketing</li>
+                </ul>
+
+                <h2>Languages</h2>
+                <ul id="t6-languages-content">
+                    <li>English (Fluent)</li>
+                    <li>French (Fluent)</li>
+                    <li>Spanish (Intermediate)</li>
+                </ul>
+
+                <h2>Reference</h2>
+                <p><strong>Estelle Dorcey</strong><br>
+                CEO - Really Great Site<br>
+                hello2@reallygreatsite.com</p>
+            </div>
+
+            <div class="template6-main">
+                <div class="template6-header">
+                    <h1 id="t6-name">Connor Hamilton</h1>
+                    <h3 id="t6-role">Expert Manager</h3>
+                </div>
+
+                <div class="template6-section">
+                    <h2>Profile</h2>
+                    <p id="t6-summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+
+                <div class="template6-section">
+                    <h2>Work Experience</h2>
+                    <div id="t6-experience-content">
+                        <div class="template6-entry">
+                            <h3>Marketing Manager & Specialist</h3>
+                            <small>Really Great Studio | 2030 – Present</small>
+                            <ul>
+                                <li>Developed and executed marketing strategies aligned with company goals.</li>
+                                <li>Lead campaigns, tracked metrics, and managed teams.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="template6-section">
+                    <h2>Education</h2>
+                    <div id="t6-education-content">
+                        <div class="template6-entry">
+                            <h3>Master of Business Management</h3>
+                            <small>Wardlure University | 2029 – 2031</small>
+                            <p>GPA: 3.8 / 4.0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Template 7 Content (Lorna Alvarado Resume) -->
+    <div id="template7-content" style="display: none;">
+        <div class="template7-resume">
+            <div class="template7-left">
+                <!-- <img src="https://placehold.co/100x100/eeeeee/2d2d2d?text=LA" alt="Profile Image" class="template7-profile-img"> -->
+                <div class="template7-section">
+                    <h3>Contact</h3>
+                    <p><strong>Phone</strong><br/><span id="t7-phone"></span></p>
+                    <p><strong>Email</strong><br/><span id="t7-email"></span></p>
+                    <p><strong>Address</strong><br/><span id="t7-address"></span></p>
+                </div>
+                <div class="template7-section">
+                    <h3>Education</h3>
+                    <div id="t7-education-content">
+                        <!-- Education will be populated here by JS -->
+                        <p>Bachelor of Marketing<br/>Wardenrie University<br/>2016 - 2020</p>
+                    </div>
+                </div>
+                <div class="template7-section">
+                    <h3>Skills</h3>
+                    <ul id="t7-skills-content">
+                        <!-- Skills will be populated here by JS -->
+                        <li>Sales Strategies</li>
+                    </ul>
+                </div>
+                <div class="template7-section">
+                    <h3>Language</h3>
+                    <div id="t7-languages-content">
+                        <!-- Languages will be populated here by JS -->
+                        <p>English</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="template7-right">
+                <h1 id="t7-name">LORNA ALVARADO</h1>
+                <h2 id="t7-role">Sales Representative</h2>
+
+                <section>
+                    <h3>Professional Experience</h3>
+                    <div id="t7-experience-content">
+                        <!-- Experience will be populated here by JS -->
+                        <div class="template7-job">
+                            <h4>Inside Sales Representative</h4>
+                            <span>2023 – Present | Anrowed Industries | 123 Anywhere St., Any City</span>
+                            <ul>
+                                <li>Developed and executed sales strategies, resulting in 25% increase in performance metrics.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>References</h3>
+                    <div class="template7-references">
+                        <div class="template7-reference">
+                            <h4>Bailey Dupont</h4>
+                            <p>Wardenrie Inc / CEO</p>
+                            <p>Phone: +123 456 7890</p>
+                            <p>Email: hello@reallygreatsite.com</p>
+                        </div>
+                        <div class="template7-reference">
+                            <h4>Harumi Kobayashi</h4>
+                            <p>Wardenrie Inc / CEO</p>
+                            <p>Phone: +123 456 7890</p>
+                            <p>Email: hello@reallygreatsite.com</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Template 8 Content (Pragya Aggarwal Resume) -->
+    <div id="template8-content" style="display: none;">
+        <div class="template8-resume">
+            <div class="template8-header">
+                <h1 id="t8-name">PRAGYA AGGARWAL</h1>
+                <h2 id="t8-role">Graphic Designer</h2>
+                <div class="template8-contact-info">
+                    <div id="t8-phone"></div>
+                    <div id="t8-address"></div>
+                    <div id="t8-email"></div>
+                </div>
+            </div>
+
+            <section class="template8-about template8-section">
+                <h3 class="template8-section-title">ABOUT ME</h3>
+                <p id="t8-summary"></p>
+            </section>
+
+            <section class="template8-experience template8-section">
+                <h3 class="template8-section-title">WORK EXPERIENCE</h3>
+                <div id="t8-experience-content">
+                    <!-- Experience items will be populated here -->
+                </div>
+            </section>
+
+            <section class="template8-skills template8-section">
+                <h3 class="template8-section-title">SKILL</h3>
+                <ul class="template8-skills" id="t8-skills-content">
+                    <!-- Skills will be populated here -->
+                </ul>
+            </section>
+
+            <section class="template8-education template8-section">
+                <h3 class="template8-section-title">EDUCATION</h3>
+                <div id="t8-education-content">
+                    <!-- Education items will be populated here -->
+                </div>
+            </section>
+
+            <section class="template8-languages template8-section">
+                <h3 class="template8-section-title">LANGUAGES</h3>
+                <div id="t8-languages-content">
+                    <!-- Language items will be populated here -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- NEW: Template 9 Content (Olivia Wilson Resume) -->
+    <div id="template9-content" style="display: none;">
+        <div class="template9-resume">
+            <div class="template9-left">
+                <img id="t9-profile-img" src="https://placehold.co/120x120/f8f8f8/111?text=OW" alt="Profile Picture">
+                
+                <div class="template9-section">
+                    <h3>EDUCATION</h3>
+                    <div id="t9-education-content">
+                        <!-- Education will be populated here -->
+                    </div>
+                </div>
+
+                <div class="template9-section">
+                    <h3>EXPERTISE</h3>
+                    <ul id="t9-skills-content">
+                        <!-- Skills will be populated here -->
+                    </ul>
+                </div>
+
+                <div class="template9-section">
+                    <h3>LANGUAGE</h3>
+                    <ul id="t9-languages-content">
+                        <!-- Languages will be populated here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="template9-right">
+                <div class="template9-name" id="t9-name">OLIVIA WILSON</div>
+                <div class="template9-title" id="t9-role">Graphics Designer</div>
+
+                <div class="template9-contacts">
+                    <div id="t9-phone">📞 +123-456-7890</div>
+                    <div id="t9-email">✉️ hello@reallygreatsite.com</div>
+                    <div id="t9-website">🌐 www.reallygreatsite.com</div>
+                </div>
+
+                <div class="template9-profile">
+                    <h3>PROFILE</h3>
+                    <p id="t9-summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam...</p>
+                </div>
+
+                <div class="template9-work">
+                    <h3>WORK EXPERIENCE</h3>
+                    <div id="t9-experience-content">
+                        <!-- Work experience will be populated here -->
+                    </div>
+                </div>
+
+                <div class="template9-references">
+                    <h3>REFERENCES</h3>
+                    <div id="t9-references-content">
+                        <!-- References will be populated here (static for now) -->
+                        <div class="template9-reference-entry">
+                            <p><strong>Bailey Dupont</strong><br>
+                            Wardiere Inc. / CEO<br>
+                            Phone: 123-456-7890<br>
+                            Email: bailey@reallygreatsite.com</p>
+                        </div>
+
+                        <div class="template9-reference-entry">
+                            <p><strong>Harumi Kobayashi</strong><br>
+                            Wardiere Inc. / CEO<br>
+                            Phone: 123-456-7890<br>
+                            Email: harumi@reallygreatsite.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Template 10 Content (Isabel Mercado Resume) -->
+    <div id="template10-content" style="display: none;">
+        <div class="template10-resume">
+            <div class="template10-left-column">
+                <div class="template10-photo">
+                    <img id="t10-profile-img" src="https://placehold.co/160.png?text=Photo" alt="Profile Photo" />
+                </div>
+                <h2>Skills</h2>
+                <ul id="t10-skills-content">
+                    <!-- Skills will be populated here -->
+                </ul>
+
+                <h2>Education</h2>
+                <div id="t10-education-content">
+                    <!-- Education will be populated here -->
+                </div>
+
+                <h2>Reference</h2>
+                <div id="t10-references-content">
+                    <!-- References will be populated here (static for now) -->
+                    <p><strong>Margarita Perez</strong><br />
+                        Laraana, RN<br />
+                        hello@reallygreatsite.com</p>
+                </div>
+            </div>
+
+            <div class="template10-right-column">
+                <h1 id="t10-name">ISABEL MERCADO</h1>
+                <h3 id="t10-role">REGISTERED NURSE</h3>
+                <div class="template10-contact">
+                    <p id="t10-phone">📞 +123-456-7890</p>
+                    <p id="t10-email">✉️ hello@reallygreatsite.com</p>
+                    <p id="t10-address">📍 123 Anywhere St., Any City</p>
+                </div>
+
+                <h2>Summary</h2>
+                <p id="t10-summary">
+                    As a dedicated and compassionate nursing professional, I bring a wealth of knowledge and experience to the healthcare field. With a strong educational background in nursing and hands-on experience in various healthcare settings, I am well-equipped to provide exceptional patient care.
+                </p>
+
+                <h2>Work Experience</h2>
+                <div id="t10-experience-content">
+                    <!-- Work experience will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <aside class="sidebar" id="main-sidebar">
+        <div class="sidebar-logo"></div>
+        <nav class="flex flex-col flex-grow">
+            <div style="margin-top: 20px;" <div class="sidebar-nav-item" data-step-index="4"><i class="fas fa-address-card"></i><span>Header</span></div>
+            <div class="sidebar-nav-item" data-step-index="5"><i class="fas fa-briefcase"></i><span>Experience</span></div>
+            <div class="sidebar-nav-item" data-step-index="6"><i class="fas fa-graduation-cap"></i><span>Education</span></div>
+            <div class="sidebar-nav-item" data-step-index="7"><i class="fas fa-lightbulb"></i><span>Skills</span></div>
+            <div class="sidebar-nav-item" data-step-index="8"><i class="fas fa-globe"></i><span>Languages</span></div>
+            <div class="sidebar-nav-item" data-step-index="9"><i class="fas fa-file-alt"></i><span>Summary</span></div>
+            <div class="sidebar-nav-item" data-step-index="10"><i class="fas fa-file-export"></i><span>Export</span></div> <!-- NEW: Export Resume option -->
+        </nav>
+        <div class="sidebar-nav-item mt-auto"><i class="fas fa-trash-alt"></i><span>Trash</span></div>
+    </aside>
+
+    <div class="main-content-wrapper">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-icon"><i class="fas fa-briefcase"></i></div>
+                <div class="logo-text">CareerMate</div>
+            </div>
+            <!-- Removed the progress-container section -->
+        </header>
+
+        <div class="content">
+            <div id="step1" class="form-step active">
+                <div class="step-icon"><i class="fas fa-briefcase"></i></div>
+                <h1 class="step-title">How much work experience do you have?</h1>
+                <p class="step-description">Select your experience level to get personalized resume recommendations</p>
+                <div class="experience-grid">
+                    <div class="experience-btn" data-value="no-experience"><i class="fas fa-user-graduate btn-icon"></i><div class="btn-text">No experience</div></div>
+                    <div class="experience-btn" data-value="entry-level"><i class="fas fa-user btn-icon"></i><div class="btn-text">Entry-level</div></div>
+                    <div class="experience-btn" data-value="mid-level"><i class="fas fa-user-tie btn-icon"></i><div class="btn-text">Mid-level</div></div>
+                    <div class="experience-btn" data-value="senior"><i class="fas fa-crown btn-icon"></i><div class="btn-text">Senior</div></div>
+                </div>
+                <button class="btn btn-primary" id="continue-step1-btn">Continue <i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div id="step2" class="form-step">
+                <div class="step-icon"><i class="fas fa-globe-americas"></i></div>
+                <h1 class="step-title">Where are you focusing your job search?</h1>
+                <p class="step-description">We'll recommend the right templates for your target country</p>
+                <div class="country-container">
+                    <label for="country-select" class="country-label">SELECT A COUNTRY</label>
+                    <div class="select-wrapper">
+                        <select class="country-select" id="country-select">
+                            <option value="India">India</option>
+                            <option value="United States">United States</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="next-step2-btn">Next <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-secondary" id="back-step2-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            </div>
+
+            <div id="step3" class="form-step">
+                <div class="step-icon"><i class="fas fa-briefcase"></i></div>
+                <h1 class="step-title">Templates recommended for you</h1>
+                <p class="step-description">You can always change your template later.</p>
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <div class="flex items-center space-x-2">
+                        
+                        
+                        
+                        <!-- Removed 3 color swatches here -->
+                    </div>
+                </div>
+                <div class="template-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+                     <div class="template-card" data-template-id="template-1">
+                        <div class="recommended-badge">RECOMMENDED</div>
+                        <img src= "{% static 'image/temp1.png' %}" alt="Resume Template 1" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 1</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <div class="template-card" data-template-id="template-2">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp2.png' %}" alt="Resume Template 2" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 2</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                     <div class="template-card" data-template-id="template-3">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp3.png' %}" alt="Resume Template 3" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 3</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- Template 4 Card -->
+                    <div class="template-card" data-template-id="template-4">
+                        <div class="recommended-badge">RECOMMENDED</div>
+                        <!-- You can replace this placeholder image with a screenshot of the Richard Sanchez resume if you have one -->
+                        <img src="{% static 'image/temp4.png' %}" alt="Resume Template 4" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 4</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- Template 5 Card -->
+                    <div class="template-card" data-template-id="template-5">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp5.png' %}" alt="Resume Template 5" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 5</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- Template 6 Card -->
+                    <div class="template-card" data-template-id="template-6">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp6.png' %}" alt="Resume Template 6" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 6</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- NEW: Template 7 Card -->
+                    <div class="template-card" data-template-id="template-7">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp7.png' %}" alt="Resume Template 7" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 7</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- NEW: Template 8 Card -->
+                    <div class="template-card" data-template-id="template-8">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp8.png' %}" alt="Resume Template 8" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 8</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- NEW: Template 9 Card -->
+                    <div class="template-card" data-template-id="template-9">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp9.png' %}" alt="Resume Template 9" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 9</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                    <!-- NEW: Template 10 Card -->
+                    <div class="template-card" data-template-id="template-10">
+                        <div class="recommended-badge">NEW</div> 
+                        <img src="{% static 'image/temp10.png' %}" alt="Resume Template 10" class="w-full h-auto object-cover border-b border-gray-200 template-image">
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 mb-2">Template 10</h3>
+                            <button type="button" class="choose-template-select-btn btn btn-primary py-1.5 px-3 text-xs rounded-full">Choose template</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4 w-full max-w-xs mt-8">
+                    <button class="btn btn-secondary" id="back-step3-btn"><i class="fas fa-arrow-left"></i> Back</button>
+                    <button class="btn btn-primary" id="continue-step3-btn">Continue <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div id="step4" class="form-step">
+                <a href="#" class="text-blue-600 hover:underline text-sm mb-8 self-start back-to-templates-link"><i class="fas fa-arrow-left mr-2"></i> Back to templates</a>
+                <h1 class="step-title">How would you like to build your resume?</h1>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+                    <div class="build-option-card" id="create-new-resume-card">
+                        <i class="fas fa-file-alt icon"></i>
+                        <div class="title">Create a New Resume</div>
+                        <p class="description">We'll go through each section together</p>
+                        <button class="btn btn-primary" id="create-new-btn">Create new</button>
+                    </div>
+                    <div class="build-option-card" id="upload-resume-card">
+                        <i class="fas fa-upload icon"></i>
+                        <div class="title">I Already Have a Resume</div>
+                        <p class="description">Import your info from a former resume</p>
+                        <button class="btn btn-primary" id="upload-btn"><i class="fas fa-upload mr-2"></i> Upload</button>
+                    </div>
+                </div>
+                <div class="flex justify-center space-x-4 w-full max-w-xs mt-8">
+                    <button class="btn btn-secondary" id="back-step4-btn"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+            </div>
+
+            <div id="step5" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">How do you want recruiters to contact you?</h1>
+                        <p class="step-description">Include your full name and at least email or phone number</p>
+                        <div class="form-row">
+                            <div class="form-field"><label for="firstName">First name</label><input type="text" id="firstName" value="Diya"></div>
+                            <div class="form-field"><label for="surname">Surname</label><input type="text" id="surname" value="Agarwal"></div>
+                        </div>
+                        <div class="form-row"><div class="form-field"><label for="city">City</label><input type="text" id="city" value="New Delhi"></div></div>
+                        <div class="form-row">
+                            <div class="form-field"><label for="country">Country</label><select id="country" class="country-select"><option value="India">India</option></select></div>
+                            <div class="form-field"><label for="pinCode">Pin code</label><input type="text" id="pinCode" value="110034"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-field"><label for="phone">Phone</label><input type="text" id="phone" value="+91 11 5565 3345"></div>
+                            <div class="form-field"><label for="email">Email</label><input type="email" id="email" value="d.agarwal@sample.in"></div>
+                        </div>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step5-btn">Back</button>
+                        <button class="btn btn-primary" id="continue-step5-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-5"></div></div>
+            </div>
+
+            <div id="step6" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">Tell us about your work experience</h1>
+                        <p class="step-description">Add your most relevant positions first.</p>
+                        <div id="experience-entries">
+                            </div>
+                        <button id="add-experience-btn" class="btn btn-secondary mt-4">Add another position</button>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step6-btn">Back</button>
+                        <button class="btn btn-primary" id="continue-step6-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-6"></div></div>
+            </div>
+
+            <div id="step7" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">Tell us about your education</h1>
+                        <p class="step-description">Add your most recent education first.</p>
+                        <div id="education-entries">
+                             </div>
+                        <button id="add-education-btn" class="btn btn-secondary mt-4">Add another education</button>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step7-btn">Back</button>
+                        <button class="btn btn-primary" id="continue-step7-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-7"></div></div>
+            </div>
+
+            <div id="step8" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">What are your key skills?</h1>
+                        <p class="step-description">List skills relevant to the jobs you are applying for.</p>
+                        <div class="form-row"><div class="form-field"><label for="skillsInput">Skills (one per line)</label><textarea id="skillsInput" rows="8">Cash register operation
+POS system operation
+Sales expertise
+Teamwork
+Inventory management
+Accurate money handling
+Documentation and recordkeeping
+Retail merchandising expertise</textarea></div></div>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step8-btn">Back</button>
+                        <button class="btn btn-primary" id="continue-step8-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-8"></div></div>
+            </div>
+
+            <div id="step9" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">What languages do you speak?</h1>
+                        <p class="step-description">List all languages and your proficiency level.</p>
+                        <div id="language-entries">
+                             </div>
+                        <button id="add-language-btn" class="btn btn-secondary mt-4">Add another language</button>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step9-btn">Back</button>
+                        <button class="btn btn-primary" id="continue-step9-btn">Continue</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-9"></div></div>
+            </div>
+
+            <div id="step10" class="form-step">
+                <div class="form-column-wrapper">
+                    <div class="form-section">
+                        <h1 class="step-title">Review and refine your summary</h1>
+                        <p class="step-description">Edit the generated summary or write your own.</p>
+                        <div class="form-row"><div class="form-field"><label for="editableSummary">Your Resume Summary</label><textarea id="editableSummary" rows="8">Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations. Demonstrated record of exceeding revenue targets by leveraging communication skills and sales expertise.</textarea>
+<div class="navigation-buttons-container">
+    <button id="export-resume" class="btn btn-primary">
+        <i class="fas fa-download"></i> Export Resume
+    </button>
+</div>
+</div></div>
+                    </div>
+                    <div class="navigation-buttons-container">
+                        <button class="btn btn-secondary" id="back-step10-btn">Back</button>
+                        <button class="btn btn-primary" id="finish-resume-btn">Finish Resume</button>
+                    </div>
+                </div>
+                <div class="resume-preview-section"><div class="resume-preview-content" id="resume-preview-content-area-10"></div></div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div id="image-preview-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <span id="close-modal" class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer">&times;</span>
+        <img id="modal-image" src="" alt="Resume Template Preview" class="max-w-full max-h-full rounded-lg">
+    </div>
+
+    <!-- Upload Resume Modal -->
+    <div id="upload-resume-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="upload-modal-content">
+            <div class="upload-modal-header">
+                <h2>Upload your resume</h2>
+                <span id="close-upload-modal" class="close-upload-modal">&times;</span>
+            </div>
+            <div class="drag-drop-area">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop your file here</p>
+                <!-- Hidden file input -->
+                <input type="file" id="resumeFileInput" accept=".doc,.docx,.pdf,.html,.rtf,.txt" class="hidden">
+                <button class="browse-button" id="browseFileButton">
+                    <i class="fas fa-upload"></i> Browse your computer
+                </button>
+                <p id="selectedFileName" class="mt-2"></p> <!-- To display selected file name -->
+                <p class="acceptable-files">Acceptable file types: DOC, DOCX, PDF, HTML, RTF, TXT</p>
+                <div class="upload-modal-footer">
+                <button class="btn btn-secondary" id="cancel-upload-btn">Cancel</button>
+                <button class="btn btn-primary" id="confirm-upload-btn">Upload</button>
+            </div>
+            </div>
+            <div class="upload-options">
+                <div class="line"></div>
+                <!-- <span class="or-divider">OR</span> -->
+                <div class="line"></div>
+            </div>
+           
+            </div>
+           
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formSteps = document.querySelectorAll('.form-step');
+            // Removed stepCounter and progressFill as per request
+            const body = document.body; 
+            const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item');
+            const colorSwatches = document.querySelectorAll('.color-swatch'); 
+            const templateImages = document.querySelectorAll('.template-image'); 
+
+            let selectedTemplateId = null;
+            let currentStepIndex = 0; 
+            const totalSteps = formSteps.length;
+
+            // Get the outerHTML of the actual resume content divs, not their wrappers
+            const template1Content = document.getElementById('template1-content').querySelector('.template1-resume').outerHTML;
+            const template2Content = document.getElementById('template2-content').querySelector('.template2-resume').outerHTML; 
+            const template3Content = document.getElementById('template3-content').querySelector('.template3-resume').outerHTML; 
+            const template4Content = document.getElementById('template4-content').querySelector('.template4-resume').outerHTML;
+            const template5Content = document.getElementById('template5-content').querySelector('.template5-resume').outerHTML;
+            const template6Content = document.getElementById('template6-content').querySelector('.template6-resume').outerHTML;
+            const template7Content = document.getElementById('template7-content').querySelector('.template7-resume').outerHTML;
+            const template8Content = document.getElementById('template8-content').querySelector('.template8-resume').outerHTML;
+            const template9Content = document.getElementById('template9-content').querySelector('.template9-resume').outerHTML;
+            const template10Content = document.getElementById('template10-content').querySelector('.template10-resume').outerHTML;
+
+
+            function updateUI() {
+                formSteps.forEach(step => step.classList.remove('active'));
+                formSteps[currentStepIndex].classList.add('active');
+                // Removed stepCounter and progressFill updates
+                body.classList.toggle('has-sidebar-layout', currentStepIndex >= 4);
+
+                sidebarNavItems.forEach(item => {
+                    item.classList.toggle('active', parseInt(item.dataset.stepIndex) === currentStepIndex);
+                });
+                updateResumePreview();
+            }
+
+            function updateResumePreview() {
+                if (currentStepIndex < 4) return;
+
+                const currentStepEl = document.getElementById(`step${currentStepIndex + 1}`);
+                if (!currentStepEl) {
+                    console.error('Current step element not found:', `step${currentStepIndex + 1}`);
+                    return;
+                }
+                const currentPreviewArea = currentStepEl.querySelector('.resume-preview-content');
+                if (!currentPreviewArea) {
+                    console.error('Resume preview content area not found for step:', `step${currentStepIndex + 1}`);
+                    return;
+                }
+                
+                let templateHtml = '';
+                switch (selectedTemplateId) {
+                    case 'template-1': templateHtml = template1Content; break;
+                    case 'template-2': templateHtml = template2Content; break;
+                    case 'template-3': templateHtml = template3Content; break;
+                    case 'template-4': templateHtml = template4Content; break;
+                    case 'template-5': templateHtml = template5Content; break;
+                    case 'template-6': templateHtml = template6Content; break;
+                    case 'template-7': templateHtml = template7Content; break;
+                    case 'template-8': templateHtml = template8Content; break;
+                    case 'template-9': templateHtml = template9Content; break;
+                    case 'template-10': templateHtml = template10Content; break;
+                    default:
+                        currentPreviewArea.innerHTML = `<div class="p-4 flex items-center justify-center h-full text-gray-500">Select a template to see the preview.</div>`;
+                        return;
+                }
+
+                // Clear the preview area completely before inserting new content
+                currentPreviewArea.innerHTML = '';
+                // Insert the new scaled-content-wrapper with the selected template's HTML
+                currentPreviewArea.innerHTML = `<div class="scaled-content-wrapper">${templateHtml}</div>`;
+                
+                // Get fresh references to the elements AFTER they have been inserted into the DOM
+                const scaledWrapper = currentPreviewArea.querySelector('.scaled-content-wrapper');
+                if (!scaledWrapper) {
+                    console.error('Scaled content wrapper not found after creation/update.');
+                    return;
+                }
+
+                // Get the actual template resume element inside the scaled wrapper
+                const wrapper = scaledWrapper.querySelector(`.${selectedTemplateId.replace('-', '')}-resume`);
+                if (!wrapper) {
+                    console.error(`${selectedTemplateId}-resume element not found inside scaled-content-wrapper.`);
+                    return; // Critical error, cannot proceed
+                }
+
+
+                // Populate data based on the selected template
+                const firstName = document.getElementById('firstName').value;
+                const surname = document.getElementById('surname').value;
+                const city = document.getElementById('city').value;
+                const country = document.getElementById('country').value;
+                const pinCode = document.getElementById('pinCode').value;
+                const phone = document.getElementById('phone').value;
+                const email = document.getElementById('email').value;
+                const summary = document.getElementById('editableSummary').value;
+                const skillsInput = document.getElementById('skillsInput').value;
+
+
+                // Common fields to populate
+                const updateTextContent = (selector, value) => {
+                    const element = wrapper.querySelector(selector);
+                    if (element) element.textContent = value;
+                };
+
+                const updateHtmlContent = (selector, value) => {
+                    const element = wrapper.querySelector(selector);
+                    if (element) element.innerHTML = value;
+                };
+
+                switch (selectedTemplateId) {
+                    case 'template-1':
+                        updateTextContent('#t1-name', `${firstName} ${surname}`);
+                        updateTextContent('#t1-phone', phone);
+                        updateTextContent('#t1-email', email);
+                        updateTextContent('#t1-address', `${city}, ${country} ${pinCode}`);
+                        updateTextContent('#t1-summary', summary);
+
+                        const skillsListT1 = wrapper.querySelector('#t1-skills');
+                        if (skillsListT1) {
+                            skillsListT1.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT1.appendChild(li);
+                            });
+                        }
+
+                        const experienceContainerT1 = wrapper.querySelector('#t1-experience');
+                        if (experienceContainerT1) {
+                            experienceContainerT1.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const expCity = entry.querySelector('[name="experienceCity"]').value;
+                                 const expCountry = entry.querySelector('[name="experienceCountry"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const jobDiv = document.createElement('div');
+                                 jobDiv.className = 'job';
+                                 jobDiv.innerHTML = `<strong>${startDate} - ${endDate}</strong><br><b>${jobTitle}, ${companyName}</b>, ${expCity}, ${expCountry}`;
+                                 const ul = document.createElement('ul');
+                                 responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                     const li = document.createElement('li');
+                                     li.textContent = line.trim();
+                                     ul.appendChild(li);
+                                 });
+                                 jobDiv.appendChild(ul);
+                                 experienceContainerT1.appendChild(jobDiv);
+                            });
+                        }
+
+                        const educationContainerT1 = wrapper.querySelector('#t1-education');
+                        if (educationContainerT1) {
+                            educationContainerT1.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const eduCity = entry.querySelector('[name="educationCity"]').value;
+                                const eduCountry = entry.querySelector('[name="educationCountry"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const eduP = document.createElement('p');
+                                eduP.innerHTML = `<strong>${gradDate}</strong><br><b>${degreeName}</b><br>${universityName}, ${eduCity}, ${eduCountry}`;
+                                educationContainerT1.appendChild(eduP);
+                            });
+                        }
+
+                        const languagesContainerT1 = wrapper.querySelector('#t1-languages');
+                        if (languagesContainerT1) {
+                            languagesContainerT1.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                if (langName) {
+                                    const p = document.createElement('p');
+                                    p.innerHTML = `<b>${langName}:</b> ${langProficiency}`;
+                                    languagesContainerT1.appendChild(p);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-2':
+                        updateTextContent('#t2-name', `${firstName} ${surname}`);
+                        updateTextContent('#t2-contact-info', `${city}, ${country} ${pinCode} | ${phone} | ${email}`);
+                        updateTextContent('#t2-summary', summary);
+
+                        const skillsCol1T2 = wrapper.querySelector('#t2-skills-col1');
+                        const skillsCol2T2 = wrapper.querySelector('#t2-skills-col2');
+                        if (skillsCol1T2 && skillsCol2T2) {
+                            skillsCol1T2.innerHTML = '';
+                            skillsCol2T2.innerHTML = '';
+                            const skillLines = skillsInput.split('\n').filter(skill => skill.trim() !== '');
+                            skillLines.forEach((skill, index) => {
+                                const li = document.createElement('li');
+                                li.className = 'template2-li';
+                                li.textContent = skill.trim();
+                                if (index % 2 === 0) {
+                                    skillsCol1T2.appendChild(li);
+                                } else {
+                                    skillsCol2T2.appendChild(li);
+                                }
+                            });
+                        }
+
+                        const experienceContainerT2 = wrapper.querySelector('#t2-experience');
+                        if (experienceContainerT2) {
+                            experienceContainerT2.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const expCity = entry.querySelector('[name="experienceCity"]').value;
+                                 const expCountry = entry.querySelector('[name="experienceCountry"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const jobDiv = document.createElement('div');
+                                 jobDiv.className = 'template2-job';
+                                 jobDiv.innerHTML = `<div class="template2-job-title">${jobTitle} | ${startDate} - ${endDate}</div>
+                                                     <div class="template2-company">${companyName} - ${expCity}, ${expCountry}</div>`;
+                                 const ul = document.createElement('ul');
+                                 ul.className = 'template2-ul';
+                                 responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                     const li = document.createElement('li');
+                                     li.className = 'template2-li';
+                                     li.textContent = line.trim();
+                                     ul.appendChild(li);
+                                 });
+                                 jobDiv.appendChild(ul);
+                                 experienceContainerT2.appendChild(jobDiv);
+                            });
+                        }
+
+                        const educationContainerT2 = wrapper.querySelector('#t2-education');
+                        if (educationContainerT2) {
+                            educationContainerT2.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const eduCity = entry.querySelector('[name="educationCity"]').value;
+                                const eduCountry = entry.querySelector('[name="educationCountry"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const eduP = document.createElement('p');
+                                eduP.className = 'template2-p';
+                                eduP.innerHTML = `<strong>${universityName}</strong> – ${eduCity}, ${eduCountry}<br><em>${degreeName}, ${gradDate}</em>`;
+                                educationContainerT2.appendChild(eduP);
+                            });
+                        }
+
+                        const languagesContainerT2 = wrapper.querySelector('#t2-languages');
+                        if (languagesContainerT2) {
+                            languagesContainerT2.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                if (langName) {
+                                    const p = document.createElement('p');
+                                    p.className = 'template2-p';
+                                    p.innerHTML = `<b>${langName}:</b> ${langProficiency}`;
+                                    languagesContainerT2.appendChild(p);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-3':
+                        updateTextContent('#t3-name', `${firstName} ${surname}`);
+                        updateTextContent('#t3-contact-info', `${city}, ${country} ${pinCode} | ${phone} | ${email}`);
+                        updateTextContent('#t3-summary', summary);
+
+                        const skillsListT3 = wrapper.querySelector('#t3-skills');
+                        if (skillsListT3) {
+                            skillsListT3.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.className = 'template3-ul li';
+                                li.textContent = skill.trim();
+                                skillsListT3.appendChild(li);
+                            });
+                        }
+
+                        const experienceContainerT3 = wrapper.querySelector('#t3-experience');
+                        if (experienceContainerT3) {
+                            experienceContainerT3.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const expCity = entry.querySelector('[name="experienceCity"]').value;
+                                 const expCountry = entry.querySelector('[name="experienceCountry"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const jobDiv = document.createElement('div');
+                                 jobDiv.className = 'template3-job';
+                                 jobDiv.innerHTML = `<div class="template3-subheading">${jobTitle}, ${startDate} – ${endDate}</div>
+                                                     <div class="template3-item-org">${companyName} – ${expCity}, ${expCountry}</div>`;
+                                 const ul = document.createElement('ul');
+                                 ul.className = 'template3-ul';
+                                 responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                     const li = document.createElement('li');
+                                     li.className = 'template3-ul li';
+                                     li.textContent = line.trim();
+                                     ul.appendChild(li);
+                                 });
+                                 jobDiv.appendChild(ul);
+                                 experienceContainerT3.appendChild(jobDiv);
+                            });
+                        }
+
+                        const educationContainerT3 = wrapper.querySelector('#t3-education');
+                        if (educationContainerT3) {
+                            educationContainerT3.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const eduCity = entry.querySelector('[name="educationCity"]').value;
+                                const eduCountry = entry.querySelector('[name="educationCountry"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const eduP = document.createElement('p');
+                                eduP.className = 'template3-p';
+                                eduP.innerHTML = `<strong>${gradDate}</strong><br>${degreeName}<br><em>${universityName}, ${eduCity}</em>`;
+                                educationContainerT3.appendChild(eduP);
+                            });
+                        }
+
+                        const languagesContainerT3 = wrapper.querySelector('#t3-languages');
+                        if (languagesContainerT3) {
+                            languagesContainerT3.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                const proficiencyValue = {
+                                    "Native speaker": 100, "C2 - Proficient": 100, "C1 - Advanced": 90,
+                                    "B2 - Upper-intermediate": 70, "B1 - Intermediate": 50,
+                                    "A2 - Pre-intermediate": 30, "A1 - Beginner": 10
+                                }[langProficiency] || 0;
+
+                                if (langName) {
+                                    const p = document.createElement('p');
+                                    p.className = 'template3-p';
+                                    p.innerHTML = `${langName}: ${langProficiency}`;
+                                    if (proficiencyValue > 0) {
+                                        p.innerHTML += `<div class="template3-lang-bar"><span style="width: ${proficiencyValue}%;"></span></div>`;
+                                    }
+                                    languagesContainerT3.appendChild(p);
+                                }
+                            });
+                        }
+                        break;
+                    
+                    case 'template-4':
+                        updateTextContent('#t4-name', `${firstName} ${surname}`);
+                        updateTextContent('#t4-role', 'Graphic Designer');
+                        updateTextContent('#t4-phone', `📞 ${phone}`);
+                        updateTextContent('#t4-email', `📧 ${email}`);
+                        updateTextContent('#t4-address', `📍 ${city}, ${country}`);
+                        updateTextContent('#t4-website', 'www.reallygreatsite.com'); // Assuming a fixed website or add input for it
+                        updateTextContent('#t4-summary', summary);
+
+                        const skillsContainerT4 = wrapper.querySelector('#t4-skills');
+                        if (skillsContainerT4) {
+                            skillsContainerT4.innerHTML = '';
+                            const skillLines = skillsInput.split('\n').filter(skill => skill.trim() !== '');
+                            const skillWidths = {
+                                "Design Software": "80%", "UI/UX Design": "60%", "Typography": "90%",
+                                "Branding and Logo": "95%", "Concept Development": "70%",
+                            };
+                            skillLines.forEach(skill => {
+                                const skillItem = document.createElement('div');
+                                skillItem.className = 'template4-skill-item';
+                                const skillText = skill.trim();
+                                const barWidth = skillWidths[skillText] || "50%";
+                                skillItem.innerHTML = `<p>${skillText}</p><div class="template4-bar"><div class="template4-bar-fill" style="width: ${barWidth};"></div></div>`;
+                                skillsContainerT4.appendChild(skillItem);
+                            });
+                        }
+
+                        const experienceContainerT4 = wrapper.querySelector('#t4-experience');
+                        if (experienceContainerT4) {
+                            experienceContainerT4.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const experienceItemDiv = document.createElement('div');
+                                 experienceItemDiv.className = 'template4-experience-item';
+                                 experienceItemDiv.innerHTML = `<strong>${companyName} (${startDate} - ${endDate})</strong><p>${jobTitle}</p><ul></ul>`;
+                                 const ul = experienceItemDiv.querySelector('ul');
+                                 responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                     const li = document.createElement('li');
+                                     li.textContent = line.trim();
+                                     ul.appendChild(li);
+                                 });
+                                 experienceContainerT4.appendChild(experienceItemDiv);
+                            });
+                        }
+
+                        const educationContainerT4 = wrapper.querySelector('#t4-education');
+                        if (educationContainerT4) {
+                            educationContainerT4.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const eduP = document.createElement('p');
+                                eduP.innerHTML = `<strong>${universityName}</strong><br>${degreeName}<br>${gradDate}`;
+                                educationContainerT4.appendChild(eduP);
+                            });
+                        }
+
+                        const languagesContainerT4 = wrapper.querySelector('#t4-languages');
+                        if (languagesContainerT4) {
+                            languagesContainerT4.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                if (langName) {
+                                    const p = document.createElement('p');
+                                    p.innerHTML = `<strong>${langName}</strong><br>${langProficiency}`;
+                                    languagesContainerT4.appendChild(p);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-5':
+                        updateTextContent('#t5-name', `${firstName} ${surname}`);
+                        updateTextContent('#t5-role', 'Product Manager');
+                        updateTextContent('#t5-address', `📍 ${city}, ${country}`);
+                        updateTextContent('#t5-phone', `📞 ${phone}`);
+                        updateTextContent('#t5-email', `📧 ${email}`);
+                        updateTextContent('#t5-website', 'reallygreatsite.com'); // Assuming a fixed website or add input for it
+                        updateTextContent('#t5-summary', summary);
+
+                        const skillsContainerT5 = wrapper.querySelector('#t5-skills-content');
+                        if (skillsContainerT5) {
+                            skillsContainerT5.innerHTML = '';
+                            const skillLines = skillsInput.split('\n').filter(skill => skill.trim() !== '');
+                            const skillDotCounts = {
+                                "Project Management": 4, "Software Development": 5, "UI UX Design": 3,
+                                "Business Analysis": 3, "Staff & User Training": 4
+                            };
+                            skillLines.forEach(skill => {
+                                const skillItem = document.createElement('div');
+                                skillItem.className = 'skill';
+                                const skillText = skill.trim();
+                                const dotCount = skillDotCounts[skillText] || 3;
+                                let dotsHtml = '';
+                                for (let i = 0; i < 5; i++) {
+                                    dotsHtml += `<span class="dot ${i < dotCount ? 'filled' : ''}"></span>`;
+                                }
+                                skillItem.innerHTML = `<div class="skill-name">${skillText}</div><div class="dots">${dotsHtml}</div>`;
+                                skillsContainerT5.appendChild(skillItem);
+                            });
+                        }
+
+                        const educationContainerT5 = wrapper.querySelector('#t5-education-content');
+                        if (educationContainerT5) {
+                            educationContainerT5.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+                                const eduCity = entry.querySelector('[name="educationCity"]').value;
+                                const eduCountry = entry.querySelector('[name="educationCountry"]').value;
+
+                                const jobDiv = document.createElement('div');
+                                jobDiv.className = 'job';
+                                jobDiv.innerHTML = `<h4>${degreeName} | ${universityName}</h4><small>${gradDate}</small><p>${eduCity}, ${eduCountry}</p>`;
+                                educationContainerT5.appendChild(jobDiv);
+                            });
+                        }
+
+                        const experienceContainerT5 = wrapper.querySelector('#t5-experience-content');
+                        if (experienceContainerT5) {
+                            experienceContainerT5.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const jobDiv = document.createElement('div');
+                                 jobDiv.className = 'job';
+                                 jobDiv.innerHTML = `<h4>${jobTitle} | ${companyName}</h4><small>${startDate} – ${endDate}</small><p>${responsibilities.split('\n').map(line => line.trim()).filter(line => line !== '').join('<br>')}</p>`;
+                                 experienceContainerT5.appendChild(jobDiv);
+                            });
+                        }
+
+                        const languagesListT5 = wrapper.querySelector('#t5-languages-content');
+                        if (languagesListT5) {
+                            languagesListT5.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                if (langName) {
+                                    const li = document.createElement('li');
+                                    li.textContent = langName;
+                                    languagesListT5.appendChild(li);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-6':
+                        updateTextContent('#t6-name', `${firstName} ${surname}`);
+                        updateTextContent('#t6-role', 'Expert Manager');
+                        updateTextContent('#t6-phone', `📞 ${phone}`);
+                        updateTextContent('#t6-email', `📧 ${email}`);
+                        updateTextContent('#t6-address', `📍 ${city}, ${country}`);
+                        updateTextContent('#t6-website', 'www.reallygreatsite.com'); // Assuming a fixed website or add input for it
+                        updateTextContent('#t6-summary', summary);
+
+                        const skillsListT6 = wrapper.querySelector('#t6-skills-content');
+                        if (skillsListT6) {
+                            skillsListT6.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT6.appendChild(li);
+                            });
+                        }
+
+                        const experienceContainerT6 = wrapper.querySelector('#t6-experience-content');
+                        if (experienceContainerT6) {
+                            experienceContainerT6.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const entryDiv = document.createElement('div');
+                                 entryDiv.className = 'template6-entry';
+                                 entryDiv.innerHTML = `<h3>${jobTitle}</h3><small>${companyName} | ${startDate} – ${endDate}</small><ul></ul>`;
+                                 const ul = entryDiv.querySelector('ul');
+                                 responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                     const li = document.createElement('li');
+                                     li.textContent = line.trim();
+                                     ul.appendChild(li);
+                                 });
+                                 experienceContainerT6.appendChild(entryDiv);
+                            });
+                        }
+
+                        const educationContainerT6 = wrapper.querySelector('#t6-education-content');
+                        if (educationContainerT6) {
+                            educationContainerT6.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const entryDiv = document.createElement('div');
+                                entryDiv.className = 'template6-entry';
+                                entryDiv.innerHTML = `<h3>${degreeName}</h3><small>${universityName} | ${gradDate}</small><p></p>`;
+                                educationContainerT6.appendChild(entryDiv);
+                            });
+                        }
+
+                        const languagesListT6 = wrapper.querySelector('#t6-languages-content');
+                        if (languagesListT6) {
+                            languagesListT6.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                if (langName) {
+                                    const li = document.createElement('li');
+                                    li.textContent = `${langName} (${langProficiency})`;
+                                    languagesListT6.appendChild(li);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-7':
+                        updateTextContent('#t7-name', `${firstName} ${surname}`.toUpperCase());
+                        updateTextContent('#t7-role', 'Sales Representative');
+                        updateTextContent('#t7-phone', phone);
+                        updateTextContent('#t7-email', email);
+                        updateTextContent('#t7-address', `${city}, ${country}`);
+
+                        const skillsListT7 = wrapper.querySelector('#t7-skills-content');
+                        if (skillsListT7) {
+                            skillsListT7.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT7.appendChild(li);
+                            });
+                        }
+
+                        const educationContainerT7 = wrapper.querySelector('#t7-education-content');
+                        if (educationContainerT7) {
+                            educationContainerT7.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const p = document.createElement('p');
+                                p.innerHTML = `${degreeName}<br/>${universityName}<br/>${gradDate}`;
+                                educationContainerT7.appendChild(p);
+                            });
+                        }
+
+                        const experienceContainerT7 = wrapper.querySelector('#t7-experience-content');
+                        if (experienceContainerT7) {
+                            experienceContainerT7.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const expCity = entry.querySelector('[name="experienceCity"]').value;
+                                 const expCountry = entry.querySelector('[name="experienceCountry"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const jobDiv = document.createElement('div');
+                                 jobDiv.className = 'template7-job';
+                                 jobDiv.innerHTML = `<h4>${jobTitle}</h4><span>${startDate} – ${endDate} | ${companyName} | ${expCity}, ${expCountry}</span><ul></ul>`;
+                                 const ul = jobDiv.querySelector('ul');
+                                 if (ul) {
+                                     responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                         const li = document.createElement('li');
+                                         li.textContent = line.trim();
+                                         ul.appendChild(li);
+                                     });
+                                 }
+                                 experienceContainerT7.appendChild(jobDiv);
+                            });
+                        }
+
+                        const languagesListT7 = wrapper.querySelector('#t7-languages-content');
+                        if (languagesListT7) {
+                            languagesListT7.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                if (langName) {
+                                    const p = document.createElement('p');
+                                    p.textContent = langName;
+                                    languagesListT7.appendChild(p);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-8':
+                        updateTextContent('#t8-name', `${firstName} ${surname}`.toUpperCase());
+                        updateTextContent('#t8-role', 'Graphic Designer');
+                        updateTextContent('#t8-phone', phone);
+                        updateTextContent('#t8-address', `${city}, ${country}`);
+                        updateTextContent('#t8-email', email);
+                        updateTextContent('#t8-summary', summary);
+
+                        const skillsListT8 = wrapper.querySelector('#t8-skills-content');
+                        if (skillsListT8) {
+                            skillsListT8.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT8.appendChild(li);
+                            });
+                        }
+
+                        const experienceContainerT8 = wrapper.querySelector('#t8-experience-content');
+                        if (experienceContainerT8) {
+                            experienceContainerT8.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const experienceItemDiv = document.createElement('div');
+                                 experienceItemDiv.className = 'template8-experience-item';
+                                 experienceItemDiv.innerHTML = `<div class="template8-experience-block"><div class="template8-experience-date">${startDate.substring(startDate.length - 4)}–${endDate === 'Current' ? 'Now' : endDate.substring(endDate.length - 4)}</div><div><div class="template8-experience-title"><span class="template8-highlight-box"></span> ${companyName} - ${jobTitle}</div><p>${responsibilities.split('\n').map(line => line.trim()).filter(line => line !== '').join('<br>')}</p></div></div>`;
+                                 experienceContainerT8.appendChild(experienceItemDiv);
+                            });
+                        }
+
+                        const educationContainerT8 = wrapper.querySelector('#t8-education-content');
+                        if (educationContainerT8) {
+                            educationContainerT8.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const eduCity = entry.querySelector('[name="educationCity"]').value;
+                                const eduCountry = entry.querySelector('[name="educationCountry"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const educationBlockDiv = document.createElement('div');
+                                educationBlockDiv.className = 'template8-education-block';
+                                educationBlockDiv.innerHTML = `<div><strong>${universityName.toUpperCase()}</strong><br/>${degreeName}, ${eduCity}, ${eduCountry}</div><div>${gradDate}</div>`;
+                                educationContainerT8.appendChild(educationBlockDiv);
+                            });
+                        }
+
+                        const languagesListT8 = wrapper.querySelector('#t8-languages-content');
+                        if (languagesListT8) {
+                            languagesListT8.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                const langProficiency = entry.querySelector('[name="languageProficiency"]').value;
+                                if (langName) {
+                                    const languageBlockDiv = document.createElement('div');
+                                    languageBlockDiv.className = 'template8-language-block';
+                                    languageBlockDiv.innerHTML = `<div><strong>${langName}</strong></div><div>${langProficiency}</div>`;
+                                    languagesListT8.appendChild(languageBlockDiv);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-9':
+                        updateTextContent('#t9-name', `${firstName} ${surname}`.toUpperCase());
+                        updateTextContent('#t9-role', 'Graphics Designer');
+                        updateTextContent('#t9-phone', `📞 ${phone}`);
+                        updateTextContent('#t9-email', `✉️ ${email}`);
+                        updateTextContent('#t9-summary', summary);
+
+                        const skillsListT9 = wrapper.querySelector('#t9-skills-content');
+                        if (skillsListT9) {
+                            skillsListT9.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT9.appendChild(li);
+                            });
+                        }
+
+                        const educationContainerT9 = wrapper.querySelector('#t9-education-content');
+                        if (educationContainerT9) {
+                            educationContainerT9.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const p = document.createElement('p');
+                                p.innerHTML = `<strong>${degreeName}</strong><br>${universityName}<br>${gradDate}`;
+                                educationContainerT9.appendChild(p);
+                            });
+                        }
+
+                        const experienceContainerT9 = wrapper.querySelector('#t9-experience-content');
+                        if (experienceContainerT9) {
+                            experienceContainerT9.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const workDiv = document.createElement('div');
+                                 workDiv.innerHTML = `<h4>${companyName} <span>${startDate.substring(startDate.length - 4)} – ${endDate === 'Current' ? 'Now' : endDate.substring(endDate.length - 4)}</span></h4><p>${jobTitle}</p><ul></ul>`;
+                                 const ul = workDiv.querySelector('ul');
+                                 if (ul) {
+                                     responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                         const li = document.createElement('li');
+                                         li.textContent = line.trim();
+                                         ul.appendChild(li);
+                                     });
+                                 }
+                                 experienceContainerT9.appendChild(workDiv);
+                            });
+                        }
+
+                        const languagesListT9 = wrapper.querySelector('#t9-languages-content');
+                        if (languagesListT9) {
+                            languagesListT9.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                if (langName) {
+                                    const li = document.createElement('li');
+                                    li.textContent = langName;
+                                    languagesListT9.appendChild(li);
+                                }
+                            });
+                        }
+                        break;
+
+                    case 'template-10':
+                        updateTextContent('#t10-name', `${firstName} ${surname}`.toUpperCase());
+                        updateTextContent('#t10-role', 'REGISTERED NURSE');
+                        updateTextContent('#t10-phone', `📞 ${phone}`);
+                        updateTextContent('#t10-email', `✉️ ${email}`);
+                        updateTextContent('#t10-address', `📍 ${city}, ${country}`);
+                        updateTextContent('#t10-summary', summary);
+
+                        const skillsListT10 = wrapper.querySelector('#t10-skills-content');
+                        if (skillsListT10) {
+                            skillsListT10.innerHTML = '';
+                            skillsInput.split('\n').filter(skill => skill.trim() !== '').forEach(skill => {
+                                const li = document.createElement('li');
+                                li.textContent = skill.trim();
+                                skillsListT10.appendChild(li);
+                            });
+                        }
+
+                        const educationContainerT10 = wrapper.querySelector('#t10-education-content');
+                        if (educationContainerT10) {
+                            educationContainerT10.innerHTML = '';
+                            document.querySelectorAll('#education-entries .education-entry').forEach(entry => {
+                                const degreeName = entry.querySelector('[name="degreeName"]').value;
+                                const universityName = entry.querySelector('[name="universityName"]').value;
+                                const gradDate = entry.querySelector('[name="graduationDate"]').value;
+
+                                const p = document.createElement('p');
+                                p.innerHTML = `<strong>${universityName}</strong><br />${degreeName}<br />${gradDate}`;
+                                educationContainerT10.appendChild(p);
+                            });
+                        }
+
+                        const experienceContainerT10 = wrapper.querySelector('#t10-experience-content');
+                        if (experienceContainerT10) {
+                            experienceContainerT10.innerHTML = '';
+                            document.querySelectorAll('#experience-entries .experience-entry').forEach(entry => {
+                                 const jobTitle = entry.querySelector('[name="jobTitle"]').value;
+                                 const companyName = entry.querySelector('[name="companyName"]').value;
+                                 const startDate = entry.querySelector('[name="startDate"]').value;
+                                 const endDate = entry.querySelector('[name="endDate"]').value;
+                                 const responsibilities = entry.querySelector('[name="responsibilities"]').value;
+
+                                 const workDiv = document.createElement('div');
+                                 workDiv.innerHTML = `<h4>${jobTitle} at ${companyName} <span>${startDate.substring(startDate.length - 4)} – ${endDate === 'Current' ? 'Now' : endDate.substring(endDate.length - 4)}</span></h4><ul></ul>`;
+                                 const ul = workDiv.querySelector('ul');
+                                 if (ul) {
+                                     responsibilities.split('\n').filter(line => line.trim() !== '').forEach(line => {
+                                         const li = document.createElement('li');
+                                         li.textContent = line.trim();
+                                         ul.appendChild(li);
+                                     });
+                                 }
+                                 experienceContainerT10.appendChild(workDiv);
+                            });
+                        }
+
+                        const languagesListT10 = wrapper.querySelector('#t10-languages-content');
+                        if (languagesListT10) {
+                            languagesListT10.innerHTML = '';
+                            document.querySelectorAll('#language-entries .language-entry').forEach(entry => {
+                                const langName = entry.querySelector('[name="languageName"]').value;
+                                if (langName) {
+                                    const li = document.createElement('li');
+                                    li.textContent = langName;
+                                    languagesListT10.appendChild(li);
+                                }
+                            });
+                        }
+                        break;
+                }
+            }
+            
+            document.querySelectorAll('.experience-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.experience-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            document.getElementById('continue-step1-btn').addEventListener('click', () => { currentStepIndex = 1; updateUI(); });
+            document.getElementById('back-step2-btn').addEventListener('click', () => { currentStepIndex = 0; updateUI(); });
+            document.getElementById('next-step2-btn').addEventListener('click', () => { currentStepIndex = 2; updateUI(); });
+            document.getElementById('back-step3-btn').addEventListener('click', () => { currentStepIndex = 1; updateUI(); });
+            
+            document.querySelectorAll('.choose-template-select-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.template-card.selected').forEach(c => c.classList.remove('selected'));
+                    const templateCard = this.closest('.template-card');
+                    templateCard.classList.add('selected');
+                    selectedTemplateId = templateCard.dataset.templateId; 
+                    currentStepIndex = 3; 
+                    updateUI();
+                });
+            });
+
+            document.getElementById('continue-step3-btn').addEventListener('click', () => {
+                if (!selectedTemplateId) { alert('Please choose a template to continue.'); return; }
+                currentStepIndex = 3; 
+                updateUI();
+            });
+
+            // Added color swatch functionality
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    colorSwatches.forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                });
+            });
+
+
+            document.getElementById('create-new-btn').addEventListener('click', () => { currentStepIndex = 4; updateUI(); });
+            document.querySelector('#step4 .back-to-templates-link').addEventListener('click', (e) => { e.preventDefault(); currentStepIndex = 2; updateUI(); });
+            document.getElementById('back-step4-btn').addEventListener('click', () => { currentStepIndex = 2; updateUI(); });
+            
+            // Navigation for steps 5-10 (updated for new language step)
+            document.getElementById('back-step5-btn').addEventListener('click', () => { currentStepIndex = 3; updateUI(); });
+            document.getElementById('continue-step5-btn').addEventListener('click', () => { currentStepIndex = 5; updateUI(); });
+
+            document.getElementById('back-step6-btn').addEventListener('click', () => { currentStepIndex = 4; updateUI(); });
+            document.getElementById('continue-step6-btn').addEventListener('click', () => { currentStepIndex = 6; updateUI(); });
+            
+            document.getElementById('back-step7-btn').addEventListener('click', () => { currentStepIndex = 5; updateUI(); });
+            document.getElementById('continue-step7-btn').addEventListener('click', () => { currentStepIndex = 7; updateUI(); });
+            
+            document.getElementById('back-step8-btn').addEventListener('click', () => { currentStepIndex = 6; updateUI(); });
+            document.getElementById('continue-step8-btn').addEventListener('click', () => { currentStepIndex = 8; updateUI(); });
+            
+            // New navigation for Step 9 (Languages)
+            document.getElementById('back-step9-btn').addEventListener('click', () => { currentStepIndex = 7; updateUI(); });
+            document.getElementById('continue-step9-btn').addEventListener('click', () => { currentStepIndex = 9; updateUI(); }); // Now goes to Step 10 (Summary)
+            
+            // Updated navigation for Step 10 (Summary)
+            document.getElementById('back-step10-btn').addEventListener('click', () => { currentStepIndex = 8; updateUI(); }); // Now goes to Step 9 (Languages)
+            document.getElementById('finish-resume-btn').addEventListener('click', () => alert('Resume building finished!'));
+
+            sidebarNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetStepIndex = parseInt(this.dataset.stepIndex);
+                    if (!isNaN(targetStepIndex)) { currentStepIndex = targetStepIndex; updateUI(); }
+                });
+            });
+
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', updateResumePreview);
+            });
+            
+            // Dynamic Form Entry Logic
+            const addExperienceBtn = document.getElementById('add-experience-btn');
+            const experienceEntriesContainer = document.getElementById('experience-entries');
+
+            function addExperienceEntry(values = {}) {
+                const newEntry = document.createElement('div');
+                newEntry.className = 'experience-entry mb-6 p-4 border rounded-lg';
+                newEntry.innerHTML = `
+                    <div class="form-row"><div class="form-field"><label>Job Title</label><input type="text" name="jobTitle" value="${values.jobTitle || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>Company Name</label><input type="text" name="companyName" value="${values.companyName || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>City</label><input type="text" name="experienceCity" value="${values.city || ''}"></div><div class="form-field"><label>Country</label><input type="text" name="experienceCountry" value="${values.country || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>Start Date</label><input type="text" name="startDate" value="${values.startDate || ''}"></div><div class="form-field"><label>End Date</label><input type="text" name="endDate" value="${values.endDate || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>Responsibilities</label><textarea name="responsibilities" rows="5">${values.responsibilities || ''}</textarea></div></div>`;
+                experienceEntriesContainer.appendChild(newEntry);
+                newEntry.querySelectorAll('input, textarea').forEach(input => input.addEventListener('input', updateResumePreview));
+            }
+            addExperienceBtn.addEventListener('click', () => addExperienceEntry());
+            
+            const addEducationBtn = document.getElementById('add-education-btn');
+            const educationEntriesContainer = document.getElementById('education-entries');
+
+            function addEducationEntry(values = {}) {
+                const newEntry = document.createElement('div');
+                newEntry.className = 'education-entry mb-6 p-4 border rounded-lg';
+                newEntry.innerHTML = `
+                    <div class="form-row"><div class="form-field"><label>Degree Name</label><input type="text" name="degreeName" value="${values.degreeName || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>School/University</label><input type="text" name="universityName" value="${values.universityName || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>City</label><input type="text" name="educationCity" value="${values.city || ''}"></div><div class="form-field"><label>Country</label><input type="text" name="educationCountry" value="${values.country || ''}"></div></div>
+                    <div class="form-row"><div class="form-field"><label>Graduation Date</label><input type="text" name="graduationDate" value="${values.gradDate || ''}"></div></div>`;
+                educationEntriesContainer.appendChild(newEntry);
+                newEntry.querySelectorAll('input').forEach(input => input.addEventListener('input', updateResumePreview));
+            }
+            addEducationBtn.addEventListener('click', () => addEducationEntry());
+
+            // New: Dynamic Language Entry Logic
+            const addLanguageBtn = document.getElementById('add-language-btn');
+            const languageEntriesContainer = document.getElementById('language-entries');
+
+            function addLanguageEntry(values = {}) {
+                const newEntry = document.createElement('div');
+                newEntry.className = 'language-entry mb-6 p-4 border rounded-lg';
+                newEntry.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-field flex-grow">
+                            <label>Language</label>
+                            <input type="text" name="languageName" value="${values.name || ''}">
+                        </div>
+                        <div class="form-field flex-grow">
+                            <label>Proficiency</label>
+                            <select name="languageProficiency">
+                                <option value="Native speaker" ${values.proficiency === 'Native speaker' ? 'selected' : ''}>Native speaker</option>
+                                <option value="C2 - Proficient" ${values.proficiency === 'C2 - Proficient' ? 'selected' : ''}>C2 - Proficient</option>
+                                <option value="C1 - Advanced" ${values.proficiency === 'C1 - Advanced' ? 'selected' : ''}>C1 - Advanced</option>
+                                <option value="B2 - Upper-intermediate" ${values.proficiency === 'B2 - Upper-intermediate' ? 'selected' : ''}>B2 - Upper-intermediate</option>
+                                <option value="B1 - Intermediate" ${values.proficiency === 'B1 - Intermediate' ? 'selected' : ''}>B1 - Intermediate</option>
+                                <option value="A2 - Pre-intermediate" ${values.proficiency === 'A2 - Pre-intermediate' ? 'selected' : ''}>A2 - Pre-intermediate</option>
+                                <option value="A1 - Beginner" ${values.proficiency === 'A1 - Beginner' ? 'selected' : ''}>A1 - Beginner</option>
+                            </select>
+                        </div>
+                    </div>`;
+                languageEntriesContainer.appendChild(newEntry);
+                newEntry.querySelectorAll('input, select').forEach(input => input.addEventListener('input', updateResumePreview));
+            }
+            addLanguageBtn.addEventListener('click', () => addLanguageEntry());
+
+            // Initial Data - Only one work experience entry now
+            addExperienceEntry({ jobTitle: 'Retail Sales Associate', companyName: 'ZARA', city: 'New Delhi', country: 'India', startDate: '02/2017', endDate: 'Current', responsibilities: 'Increased monthly sales 10% by upselling products.\nPrevented losses using attention to detail.\nMaintained accurate payment records.' });
+            addEducationEntry({ degreeName: 'Diploma in Financial Accounting', universityName: 'Oxford Software Institute', city: 'New Delhi', country: 'India', gradDate: '2016' });
+            addLanguageEntry({ name: 'Hindi', proficiency: 'Native speaker' });
+            addLanguageEntry({ name: 'English', proficiency: 'C2 - Proficient' });
+            addLanguageEntry({ name: 'Bengali', proficiency: 'B2 - Upper-intermediate' });
+
+
+            // Image Modal Logic
+            const modal = document.getElementById('image-preview-modal');
+            const modalImage = document.getElementById('modal-image');
+            templateImages.forEach(img => { 
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    modalImage.src = this.src;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                });
+            });
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            document.getElementById('close-modal').addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+            // Upload Resume Modal Logic
+            const uploadModal = document.getElementById('upload-resume-modal');
+            const uploadBtn = document.getElementById('upload-btn');
+            const closeUploadModalBtn = document.getElementById('close-upload-modal');
+            const cancelUploadBtn = document.getElementById('cancel-upload-btn');
+            const resumeFileInput = document.getElementById('resumeFileInput');
+            const browseFileButton = document.getElementById('browseFileButton');
+            const selectedFileNameDisplay = document.getElementById('selectedFileName');
+
+            uploadBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Prevent default button behavior
+                uploadModal.classList.remove('hidden');
+                uploadModal.classList.add('flex');
+                selectedFileNameDisplay.textContent = ''; // Clear previous selection
+                resumeFileInput.value = ''; // Clear file input
+            });
+
+            closeUploadModalBtn.addEventListener('click', function() {
+                uploadModal.classList.add('hidden');
+                uploadModal.classList.remove('flex');
+            });
+
+            cancelUploadBtn.addEventListener('click', function() {
+                uploadModal.classList.add('hidden');
+                uploadModal.classList.remove('flex');
+            });
+
+            uploadModal.addEventListener('click', (e) => {
+                if (e.target === uploadModal) {
+                    uploadModal.classList.add('hidden');
+                    uploadModal.classList.remove('flex');
+                }
+            });
+
+            // Trigger hidden file input when "Browse your computer" button is clicked
+            browseFileButton.addEventListener('click', () => {
+                resumeFileInput.click();
+            });
+
+            // Display selected file name
+            resumeFileInput.addEventListener('change', (event) => {
+                if (event.target.files.length > 0) {
+                    selectedFileNameDisplay.textContent = `Selected file: ${event.target.files[0].name}`;
+                } else {
+                    selectedFileNameDisplay.textContent = '';
+                }
+            });
+
+            // Placeholder for actual upload logic (e.g., file input, API calls)
+            document.getElementById('confirm-upload-btn').addEventListener('click', function() {
+                if (resumeFileInput.files.length > 0) {
+                    const file = resumeFileInput.files[0];
+                    // In a real application, you would send this 'file' to a server
+                    // For now, we'll just confirm the selection.
+                    alert(`Simulating upload of: ${file.name}. In a real app, this would be sent to a server.`);
+                    uploadModal.classList.add('hidden');
+                    uploadModal.classList.remove('flex');
+                } else {
+                    alert('Please select a file to upload.');
+                }
+            });
+
+
+            updateUI();
+        });
+    </script>
+</body>
+</html>
